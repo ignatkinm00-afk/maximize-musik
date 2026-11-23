@@ -1,0 +1,77 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: 'Адрес API (https://…onrender.com). Пусто — задать в приложении'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Build web
+        env:
+          VITE_BASE: ./
+          VITE_API_URL: ${{ inputs.api_url || vars.VITE_API_URL }}
+        run: npm run build
+
+      - name: Prepare Android assets
+        env:
+          API_URL: ${{ inputs.api_url || vars.VITE_API_URL }}
+        run: node tools/prepare-android.mjs
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.11.1
+
+      - name: Build APK
+        run: gradle -p apps/mobile/android assembleDebug --no-daemon --stacktrace
+
+      - name: Rename APK
+        run: |
+          mkdir -p dist-apk
+          cp apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk dist-apk/Maximize-Musik-1.0.0.apk
+          ls -lh dist-apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: maximize-musik-apk
+          path: dist-apk/Maximize-Musik-1.0.0.apk
+          retention-days: 30
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Maximize Musik ${{ github.ref_name }}
+          files: dist-apk/Maximize-Musik-1.0.0.apk
+          generate_release_notes: true

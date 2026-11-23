@@ -22,3 +22,8 @@ coverage/
 .electron-builder-cache/
 .eb-cache2/
 .edge-profile/
+apps/mobile/android/.gradle/
+apps/mobile/android/local.properties
+apps/mobile/android/**/build/
+apps/mobile/android/app/src/main/assets/public/
+*.apk

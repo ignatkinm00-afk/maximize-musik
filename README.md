@@ -25,6 +25,7 @@
 | **Веб + PWA** | React 19, TypeScript, Vite, framer-motion | `apps/web` |
 | **API** | Fastify 5, SQLite / PostgreSQL, JWT, scrypt | `apps/api` |
 | **Windows** | Electron, electron-builder (NSIS + portable) | `apps/desktop` |
+| **Android APK** | WebView-оболочка, Gradle, GitHub Actions | `apps/mobile` |
 | **Telegram** | grammY, Mini App, проверка `initData` | `apps/api/src/lib/telegram.ts` |
 
 ### Возможности
@@ -36,6 +37,7 @@
 - медиа-клавиши и экран блокировки через Media Session API;
 - лайки, история прослушиваний, плейлисты;
 - `PWA`: установка на телефон, офлайн-оболочка, ярлыки;
+- **Android APK** с тем же интерфейсом (WebView + локальные ассеты);
 - вход по email или автоматически через Telegram;
 - уведомления в приложении и в Telegram, отметка прочитанного.
 
@@ -62,7 +64,7 @@
 Ни Docker, ни PostgreSQL для локального запуска не нужны.
 
 ```bash
-git clone https://github.com/OWNER/REPO.git maximize-musik
+git clone https://github.com/ignatkinm00-afk/maximize-musik.git
 cd maximize-musik
 npm install
 cp .env.example .env      # Windows: copy .env.example .env
@@ -260,7 +262,31 @@ Render, например `https://maximize-musik-api.onrender.com`. Адрес �
 Сборка на Windows требует интернет для загрузки Electron и NSIS. Подпись кода не
 настроена — SmartScreen может показать предупреждение «Неизвестный издатель».
 
-### Свой VPS (альтернатива)
+### 6. Android APK (GitHub Actions)
+
+APK собирается автоматически в GitHub Actions — отдельный Android SDK на компьютере не нужен.
+
+- каждый пуш в `main` → вкладка **Actions → Build Android APK → artifacts** (`maximize-musik-apk`);
+- пуш тега `v*` → APK прикрепляется к **Releases** репозитория;
+- можно запустить вручную: **Actions → Build Android APK → Run workflow**, при желании указав
+  `api_url` (тогда адрес API зашьётся в APK).
+
+Адрес API для APK берётся из переменной репозитория `VITE_API_URL`. Если она пустая, при первом
+запуске нажми **«Подключить сервер API»** на экране входа и вставь адрес Render.
+
+Локальная сборка (нужны JDK 21 и Android SDK):
+
+```bash
+npm run build          # VITE_BASE=./ для file://
+node tools/prepare-android.mjs
+gradle -p apps/mobile/android assembleDebug
+# APK: apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+APK подписан debug-ключом и ставится на телефон с разрешением «Установка из неизвестных
+источников». Для публикации в Google Play понадобится собственный release-keystore.
+
+### 7. Свой VPS (альтернатива)
 
 ```bash
 docker compose up -d --build
