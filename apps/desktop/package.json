@@ -1,0 +1,64 @@
+{
+  "name": "@maximize/desktop",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Maximize Musik для Windows",
+  "author": "Maximize Musik",
+  "main": "main.mjs",
+  "scripts": {
+    "prepare:renderer": "node scripts/prepare.mjs",
+    "start": "electron .",
+    "dist": "node scripts/prepare.mjs && electron-builder --win nsis portable --x64",
+    "dist:dir": "node scripts/prepare.mjs && electron-builder --win dir --x64"
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest"
+  },
+  "build": {
+    "appId": "com.maximize.musik",
+    "productName": "Maximize Musik",
+    "copyright": "Maximize Musik",
+    "npmRebuild": false,
+    "electronVersion": "45.4.1",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.mjs",
+      "preload.cjs",
+      "renderer/**/*",
+      "build/icon.png"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Maximize Musik",
+      "artifactName": "Maximize-Musik-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Maximize-Musik-Portable-${version}.${ext}"
+    }
+  }
+}

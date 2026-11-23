@@ -1,0 +1,722 @@
+[
+  {
+    "title": "MORNINGS",
+    "artist": "Jason Shaw",
+    "album": "Audionautix: Acoustic",
+    "genre": "Country",
+    "duration": 154,
+    "audioUrl": "https://archive.org/download/Audionautix_Acoustic-9870/Jason_Shaw_-_12_MORNINGS.mp3",
+    "coverUrl": "https://archive.org/services/img/Audionautix_Acoustic-9870",
+    "color": "#8b5cf6"
+  },
+  {
+    "title": "ACOUSTIC BLUES",
+    "artist": "Jason Shaw",
+    "album": "Audionautix: Acoustic",
+    "genre": "Country",
+    "duration": 153,
+    "audioUrl": "https://archive.org/download/Audionautix_Acoustic-9870/Jason_Shaw_-_ACOUSTIC_BLUES.mp3",
+    "coverUrl": "https://archive.org/services/img/Audionautix_Acoustic-9870",
+    "color": "#ec4899"
+  },
+  {
+    "title": "Also Sprach Zarathustra",
+    "artist": "Kevin MacLeod",
+    "album": "Classical Sampler",
+    "genre": "Classical",
+    "duration": 86,
+    "audioUrl": "https://archive.org/download/Classical_Sampler-9615/Kevin_MacLeod_-_Also_Sprach_Zarathustra.mp3",
+    "coverUrl": "https://archive.org/services/img/Classical_Sampler-9615",
+    "color": "#22d3ee"
+  },
+  {
+    "title": "Amazing Grace 2011",
+    "artist": "Kevin MacLeod",
+    "album": "Classical Sampler",
+    "genre": "Classical",
+    "duration": 189,
+    "audioUrl": "https://archive.org/download/Classical_Sampler-9615/Kevin_MacLeod_-_Amazing_Grace_2011.mp3",
+    "coverUrl": "https://archive.org/services/img/Classical_Sampler-9615",
+    "color": "#f59e0b"
+  },
+  {
+    "title": "Dummy",
+    "artist": "Jahzzar",
+    "album": "Grab Bag",
+    "genre": "Pop",
+    "duration": 234,
+    "audioUrl": "https://archive.org/download/Grab_Bag-12446/01_-_Dummy.mp3",
+    "coverUrl": "https://archive.org/services/img/Grab_Bag-12446",
+    "color": "#34d399"
+  },
+  {
+    "title": "Candlelight",
+    "artist": "Jahzzar",
+    "album": "Grab Bag",
+    "genre": "Pop",
+    "duration": 308,
+    "audioUrl": "https://archive.org/download/Grab_Bag-12446/02_-_Candlelight.mp3",
+    "coverUrl": "https://archive.org/services/img/Grab_Bag-12446",
+    "color": "#6366f1"
+  },
+  {
+    "title": "Winter Sunshine",
+    "artist": "Evgeny Grinko",
+    "album": "Winter Sunshine EP",
+    "genre": "Soundtrack",
+    "duration": 195,
+    "audioUrl": "https://archive.org/download/Winter_Sunshine_EP-8201/Evgeny_Grinko_-_01_-_Winter_Sunshine.mp3",
+    "coverUrl": "https://archive.org/services/img/Winter_Sunshine_EP-8201",
+    "color": "#f43f5e"
+  },
+  {
+    "title": "Other Child Room",
+    "artist": "Evgeny Grinko",
+    "album": "Winter Sunshine EP",
+    "genre": "Soundtrack",
+    "duration": 130,
+    "audioUrl": "https://archive.org/download/Winter_Sunshine_EP-8201/Evgeny_Grinko_-_02_-_Other_Child_Room.mp3",
+    "coverUrl": "https://archive.org/services/img/Winter_Sunshine_EP-8201",
+    "color": "#8b5cf6"
+  },
+  {
+    "title": "Spring Mvt 1 Allegro",
+    "artist": "John Harrison with the Wichita State University Chamber Players",
+    "album": "The Four Seasons (Vivaldi)",
+    "genre": "Classical",
+    "duration": 215,
+    "audioUrl": "https://archive.org/download/The_Four_Seasons_Vivaldi-10361/John_Harrison_with_the_Wichita_State_University_Chamber_Players_-_01_-_Spring_Mvt_1_Allegro.mp3",
+    "coverUrl": "https://archive.org/services/img/The_Four_Seasons_Vivaldi-10361",
+    "color": "#ec4899"
+  },
+  {
+    "title": "Spring Mvt 2 Largo",
+    "artist": "John Harrison with the Wichita State University Chamber Players",
+    "album": "The Four Seasons (Vivaldi)",
+    "genre": "Classical",
+    "duration": 172,
+    "audioUrl": "https://archive.org/download/The_Four_Seasons_Vivaldi-10361/John_Harrison_with_the_Wichita_State_University_Chamber_Players_-_02_-_Spring_Mvt_2_Largo.mp3",
+    "coverUrl": "https://archive.org/services/img/The_Four_Seasons_Vivaldi-10361",
+    "color": "#22d3ee"
+  },
+  {
+    "title": "Singing Forest",
+    "artist": "M.W.D.",
+    "album": "Singing Forest",
+    "genre": "Jazz",
+    "duration": 354,
+    "audioUrl": "https://archive.org/download/Singing_Forest-6930/MWD_-_01_-_Singing_Forest.mp3",
+    "coverUrl": "https://archive.org/services/img/Singing_Forest-6930",
+    "color": "#f59e0b"
+  },
+  {
+    "title": "Elephant",
+    "artist": "M.W.D.",
+    "album": "Singing Forest",
+    "genre": "Jazz",
+    "duration": 336,
+    "audioUrl": "https://archive.org/download/Singing_Forest-6930/MWD_-_02_-_Elephant.mp3",
+    "coverUrl": "https://archive.org/services/img/Singing_Forest-6930",
+    "color": "#34d399"
+  },
+  {
+    "title": "Things",
+    "artist": "Adam & Alma",
+    "album": "Back To The Sea",
+    "genre": "Electronic",
+    "duration": 428,
+    "audioUrl": "https://archive.org/download/Back_To_The_Sea-8076/Adam__Alma_-_01_-_Things.mp3",
+    "coverUrl": "https://archive.org/services/img/Back_To_The_Sea-8076",
+    "color": "#6366f1"
+  },
+  {
+    "title": "Smile For Me, Sun",
+    "artist": "Adam & Alma",
+    "album": "Back To The Sea",
+    "genre": "Electronic",
+    "duration": 348,
+    "audioUrl": "https://archive.org/download/Back_To_The_Sea-8076/Adam__Alma_-_02_-_Smile_For_Me_Sun.mp3",
+    "coverUrl": "https://archive.org/services/img/Back_To_The_Sea-8076",
+    "color": "#f43f5e"
+  },
+  {
+    "title": "Bojo Loro",
+    "artist": "TerbujurKaku",
+    "album": "Megamix Album (Koplo Goes To Breakcore)",
+    "genre": "Glitch",
+    "duration": 75,
+    "audioUrl": "https://archive.org/download/Megamix_Album-6124/TerbujurKaku_-_01_-_Bojo_Loro.mp3",
+    "coverUrl": "https://archive.org/services/img/Megamix_Album-6124",
+    "color": "#8b5cf6"
+  },
+  {
+    "title": "Meneketehe",
+    "artist": "TerbujurKaku",
+    "album": "Megamix Album (Koplo Goes To Breakcore)",
+    "genre": "Glitch",
+    "duration": 80,
+    "audioUrl": "https://archive.org/download/Megamix_Album-6124/TerbujurKaku_-_02_-_Meneketehe.mp3",
+    "coverUrl": "https://archive.org/services/img/Megamix_Album-6124",
+    "color": "#ec4899"
+  },
+  {
+    "title": "I'll Be Good",
+    "artist": "Setec",
+    "album": "I'll Be Good EP",
+    "genre": null,
+    "duration": 188,
+    "audioUrl": "https://archive.org/download/Ill_Be_Good_EP-12234/Setec_-_01_-_Ill_Be_Good.mp3",
+    "coverUrl": "https://archive.org/services/img/Ill_Be_Good_EP-12234",
+    "color": "#22d3ee"
+  },
+  {
+    "title": "Vowel Of Owl",
+    "artist": "Setec",
+    "album": "I'll Be Good EP",
+    "genre": null,
+    "duration": 127,
+    "audioUrl": "https://archive.org/download/Ill_Be_Good_EP-12234/Setec_-_02_-_Vowel_Of_Owl.mp3",
+    "coverUrl": "https://archive.org/services/img/Ill_Be_Good_EP-12234",
+    "color": "#f59e0b"
+  },
+  {
+    "title": "SAN DIMAS OASIS",
+    "artist": "COOLRUNNINGS",
+    "album": "BABES FOREVER",
+    "genre": "Indie-Rock",
+    "duration": 214,
+    "audioUrl": "https://archive.org/download/BABES_FOREVER-6932/COOLRUNNINGS_-_01_-_SAN_DIMAS_OASIS.mp3",
+    "coverUrl": "https://archive.org/services/img/BABES_FOREVER-6932",
+    "color": "#34d399"
+  },
+  {
+    "title": "BABES FOREVER",
+    "artist": "COOLRUNNINGS",
+    "album": "BABES FOREVER",
+    "genre": "Indie-Rock",
+    "duration": 254,
+    "audioUrl": "https://archive.org/download/BABES_FOREVER-6932/COOLRUNNINGS_-_02_-_BABES_FOREVER.mp3",
+    "coverUrl": "https://archive.org/services/img/BABES_FOREVER-6932",
+    "color": "#6366f1"
+  },
+  {
+    "title": "rewind",
+    "artist": "Kučka",
+    "album": "Kučka EP",
+    "genre": null,
+    "duration": 328,
+    "audioUrl": "https://archive.org/download/Kuka_EP-12251/Kuka_-_01_-_rewind.mp3",
+    "coverUrl": "https://archive.org/services/img/Kuka_EP-12251",
+    "color": "#f43f5e"
+  },
+  {
+    "title": "the operation",
+    "artist": "Kučka",
+    "album": "Kučka EP",
+    "genre": null,
+    "duration": 299,
+    "audioUrl": "https://archive.org/download/Kuka_EP-12251/Kuka_-_02_-_the_operation.mp3",
+    "coverUrl": "https://archive.org/services/img/Kuka_EP-12251",
+    "color": "#8b5cf6"
+  },
+  {
+    "title": "La Conjuration - Grande Ouverture",
+    "artist": "ZUHN",
+    "album": "los suenos lucifer",
+    "genre": "Religious/Black Folk",
+    "duration": 139,
+    "audioUrl": "https://archive.org/download/los_suenos_lucifer-6278/ZUHN_-_01_-_La_Conjuration_-_Grande_Ouverture.mp3",
+    "coverUrl": "https://archive.org/services/img/los_suenos_lucifer-6278",
+    "color": "#ec4899"
+  },
+  {
+    "title": "Célébration",
+    "artist": "ZUHN",
+    "album": "los suenos lucifer",
+    "genre": "Religious/Black Folk",
+    "duration": 313,
+    "audioUrl": "https://archive.org/download/los_suenos_lucifer-6278/ZUHN_-_02_-_Clbration.mp3",
+    "coverUrl": "https://archive.org/services/img/los_suenos_lucifer-6278",
+    "color": "#22d3ee"
+  },
+  {
+    "title": "Be A King",
+    "artist": "Metaharmoniks",
+    "album": "Be A King",
+    "genre": null,
+    "duration": 208,
+    "audioUrl": "https://archive.org/download/Be_A_King-9747/Metaharmoniks_-_01_-_Be_A_King.mp3",
+    "coverUrl": "https://archive.org/services/img/Be_A_King-9747",
+    "color": "#f59e0b"
+  },
+  {
+    "title": "Be A King (Klitbeats remix)",
+    "artist": "Metaharmoniks",
+    "album": "Be A King",
+    "genre": null,
+    "duration": 344,
+    "audioUrl": "https://archive.org/download/Be_A_King-9747/Metaharmoniks_-_02_-_Be_A_King_Klitbeats_remix.mp3",
+    "coverUrl": "https://archive.org/services/img/Be_A_King-9747",
+    "color": "#34d399"
+  },
+  {
+    "title": "Martinika (dada radio version)",
+    "artist": "NeoBrazilians (Various Artists)",
+    "album": "July",
+    "genre": "Pop",
+    "duration": 415,
+    "audioUrl": "https://archive.org/download/July-12126/Bagda_Vermouth_-_05_-_Martinika_dada_radio_version.mp3",
+    "coverUrl": "https://archive.org/services/img/July-12126",
+    "color": "#6366f1"
+  },
+  {
+    "title": "Rebuild Jampa Sessions",
+    "artist": "NeoBrazilians (Various Artists)",
+    "album": "July",
+    "genre": "Pop",
+    "duration": 384,
+    "audioUrl": "https://archive.org/download/July-12126/Chico_Correa_Pocket_Band_-_04_-_Rebuild_Jampa_Sessions.mp3",
+    "coverUrl": "https://archive.org/services/img/July-12126",
+    "color": "#f43f5e"
+  },
+  {
+    "title": "Intro",
+    "artist": "Krestovsky",
+    "album": "Looks(ee)",
+    "genre": "Psych-Folk",
+    "duration": 206,
+    "audioUrl": "https://archive.org/download/Looksee-7904/Krestovsky_-_01_-_Intro.mp3",
+    "coverUrl": "https://archive.org/services/img/Looksee-7904",
+    "color": "#8b5cf6"
+  },
+  {
+    "title": "Olympic Love",
+    "artist": "Krestovsky",
+    "album": "Looks(ee)",
+    "genre": "Psych-Folk",
+    "duration": 213,
+    "audioUrl": "https://archive.org/download/Looksee-7904/Krestovsky_-_02_-_Olympic_Love.mp3",
+    "coverUrl": "https://archive.org/services/img/Looksee-7904",
+    "color": "#ec4899"
+  },
+  {
+    "title": "O Fortuna",
+    "artist": "MIT Concert Choir",
+    "album": "Carmina Burana [Carl Orff]",
+    "genre": "Classical",
+    "duration": 148,
+    "audioUrl": "https://archive.org/download/Carmina_Burana_Carl_Orff-9275/MIT_Concert_Choir_-_01_-_O_Fortuna.mp3",
+    "coverUrl": "https://archive.org/services/img/Carmina_Burana_Carl_Orff-9275",
+    "color": "#22d3ee"
+  },
+  {
+    "title": "Fortune planto vulnera",
+    "artist": "MIT Concert Choir",
+    "album": "Carmina Burana [Carl Orff]",
+    "genre": "Classical",
+    "duration": 170,
+    "audioUrl": "https://archive.org/download/Carmina_Burana_Carl_Orff-9275/MIT_Concert_Choir_-_02_-_Fortune_planto_vulnera.mp3",
+    "coverUrl": "https://archive.org/services/img/Carmina_Burana_Carl_Orff-9275",
+    "color": "#f59e0b"
+  },
+  {
+    "title": "Aria",
+    "artist": "Kimiko Ishizaka",
+    "album": "The Open Goldberg Variations",
+    "genre": "Classical",
+    "duration": 300,
+    "audioUrl": "https://archive.org/download/The_Open_Goldberg_Variations-11823/Kimiko_Ishizaka_-_01_-_Aria.mp3",
+    "coverUrl": "https://archive.org/services/img/The_Open_Goldberg_Variations-11823",
+    "color": "#34d399"
+  },
+  {
+    "title": "Variatio 1 a 1 Clav.",
+    "artist": "Kimiko Ishizaka",
+    "album": "The Open Goldberg Variations",
+    "genre": "Classical",
+    "duration": 116,
+    "audioUrl": "https://archive.org/download/The_Open_Goldberg_Variations-11823/Kimiko_Ishizaka_-_02_-_Variatio_1_a_1_Clav.mp3",
+    "coverUrl": "https://archive.org/services/img/The_Open_Goldberg_Variations-11823",
+    "color": "#6366f1"
+  },
+  {
+    "title": "Get It Off Your Chest",
+    "artist": "Tom Caruana",
+    "album": "Welcome Aboard [Budabeats]",
+    "genre": "Hip Hop",
+    "duration": 178,
+    "audioUrl": "https://archive.org/download/Welcome_Aboard-5483/Tom_Caruana_-_07_-_Get_It_Off_Your_Chest.mp3",
+    "coverUrl": "https://archive.org/services/img/Welcome_Aboard-5483",
+    "color": "#f43f5e"
+  },
+  {
+    "title": "Bach, French Suite 4, BWV 815, 1 Allemande",
+    "artist": "Felipe Sarro",
+    "album": "Bach: Original works and transcriptions",
+    "genre": "Classical",
+    "duration": 186,
+    "audioUrl": "https://archive.org/download/Bach_Original_works_and_transcriptions-6556/Felipe_Sarro_-_01_-_Bach_French_Suite_4_BWV_815_1_Allemande.mp3",
+    "coverUrl": "https://archive.org/services/img/Bach_Original_works_and_transcriptions-6556",
+    "color": "#8b5cf6"
+  },
+  {
+    "title": "Bach, French Suite 4, BWV 815, 2 Courante",
+    "artist": "Felipe Sarro",
+    "album": "Bach: Original works and transcriptions",
+    "genre": "Classical",
+    "duration": 125,
+    "audioUrl": "https://archive.org/download/Bach_Original_works_and_transcriptions-6556/Felipe_Sarro_-_02_-_Bach_French_Suite_4_BWV_815_2_Courante.mp3",
+    "coverUrl": "https://archive.org/services/img/Bach_Original_works_and_transcriptions-6556",
+    "color": "#ec4899"
+  },
+  {
+    "title": "Foul Mouthed Birthday Robot",
+    "artist": "The New Happy Birthday Song Contest",
+    "album": "The New Birthday Song Contest",
+    "genre": "Lo-Fi",
+    "duration": 86,
+    "audioUrl": "https://archive.org/download/The_New_Birthday_Song_Contest-13010/A-1_Mr_Son_-_139_-_Foul_Mouthed_Birthday_Robot.mp3",
+    "coverUrl": "https://archive.org/services/img/The_New_Birthday_Song_Contest-13010",
+    "color": "#22d3ee"
+  },
+  {
+    "title": "Happy Birthday",
+    "artist": "The New Happy Birthday Song Contest",
+    "album": "The New Birthday Song Contest",
+    "genre": "Jazz",
+    "duration": 133,
+    "audioUrl": "https://archive.org/download/The_New_Birthday_Song_Contest-13010/Alexander_Klser_-_127_-_Happy_Birthday.mp3",
+    "coverUrl": "https://archive.org/services/img/The_New_Birthday_Song_Contest-13010",
+    "color": "#f59e0b"
+  },
+  {
+    "title": "Brainwank (Psycho Foo Edit)",
+    "artist": "Various Artists",
+    "album": "Wakka Chikka Wakka Chikka: Porn Music for the Masses Volume 1",
+    "genre": "Electronic",
+    "duration": 184,
+    "audioUrl": "https://archive.org/download/Wakka_Chikka_Wakka_Chikka_Volume_1-13245/Colektro_-_14_-_Brainwank_Psycho_Foo_Edit.mp3",
+    "coverUrl": "https://archive.org/services/img/Wakka_Chikka_Wakka_Chikka_Volume_1-13245",
+    "color": "#34d399"
+  },
+  {
+    "title": "Vuluke Khall (Instrumental Version)",
+    "artist": "Various Artists",
+    "album": "Wakka Chikka Wakka Chikka: Porn Music for the Masses Volume 1",
+    "genre": "Electronic",
+    "duration": 226,
+    "audioUrl": "https://archive.org/download/Wakka_Chikka_Wakka_Chikka_Volume_1-13245/DJ_Bootsie_-_03_-_Vuluke_Khall_Instrumental_Version.mp3",
+    "coverUrl": "https://archive.org/services/img/Wakka_Chikka_Wakka_Chikka_Volume_1-13245",
+    "color": "#6366f1"
+  },
+  {
+    "title": "AcidJazz",
+    "artist": "Kevin MacLeod",
+    "album": "Jazz Sampler",
+    "genre": "Jazz",
+    "duration": 212,
+    "audioUrl": "https://archive.org/download/Jazz_Sampler-9619/Kevin_MacLeod_-_AcidJazz.mp3",
+    "coverUrl": "https://archive.org/services/img/Jazz_Sampler-9619",
+    "color": "#f43f5e"
+  },
+  {
+    "title": "Acid Trumpet",
+    "artist": "Kevin MacLeod",
+    "album": "Jazz Sampler",
+    "genre": "Jazz",
+    "duration": 212,
+    "audioUrl": "https://archive.org/download/Jazz_Sampler-9619/Kevin_MacLeod_-_Acid_Trumpet.mp3",
+    "coverUrl": "https://archive.org/services/img/Jazz_Sampler-9619",
+    "color": "#8b5cf6"
+  },
+  {
+    "title": "Kokusai_Bunka_Shinkokai_-_01_-_Taishikich_Chshi",
+    "artist": "Kokusai Bunka Shinkokai",
+    "album": "Japanese Traditional Music",
+    "genre": null,
+    "duration": 191,
+    "audioUrl": "https://archive.org/download/Japanese_Traditional_Music-3630/Kokusai_Bunka_Shinkokai_-_01_-_Taishikich_Chshi.mp3",
+    "coverUrl": "https://archive.org/services/img/Japanese_Traditional_Music-3630",
+    "color": "#ec4899"
+  },
+  {
+    "title": "Ao Mar",
+    "artist": "Azevedo Silva",
+    "album": "Tartaruga",
+    "genre": null,
+    "duration": 67,
+    "audioUrl": "https://archive.org/download/Tartaruga-12774/Azevedo_Silva_-_01_-_Ao_Mar.mp3",
+    "coverUrl": "https://archive.org/services/img/Tartaruga-12774",
+    "color": "#22d3ee"
+  },
+  {
+    "title": "Frio e Fome",
+    "artist": "Azevedo Silva",
+    "album": "Tartaruga",
+    "genre": null,
+    "duration": 197,
+    "audioUrl": "https://archive.org/download/Tartaruga-12774/Azevedo_Silva_-_02_-_Frio_e_Fome.mp3",
+    "coverUrl": "https://archive.org/services/img/Tartaruga-12774",
+    "color": "#f59e0b"
+  },
+  {
+    "title": "Rock Bottom, Pop. 1",
+    "artist": "Robbie Fulks",
+    "album": "Country Love Songs",
+    "genre": "Country",
+    "duration": 160,
+    "audioUrl": "https://archive.org/download/Country_Love_Songs-3215/Robbie_Fulks_-_02_-_Rock_Bottom_Pop_1.mp3",
+    "coverUrl": "https://archive.org/services/img/Country_Love_Songs-3215",
+    "color": "#34d399"
+  },
+  {
+    "title": "Tears Only Run One Way",
+    "artist": "Robbie Fulks",
+    "album": "Country Love Songs",
+    "genre": "Country",
+    "duration": 170,
+    "audioUrl": "https://archive.org/download/Country_Love_Songs-3215/Robbie_Fulks_-_12_-_Tears_Only_Run_One_Way.mp3",
+    "coverUrl": "https://archive.org/services/img/Country_Love_Songs-3215",
+    "color": "#6366f1"
+  },
+  {
+    "title": "Love ii",
+    "artist": "Claudio Nuñez",
+    "album": "Love Hurts",
+    "genre": "Jazz",
+    "duration": 874,
+    "audioUrl": "https://archive.org/download/Love_Hurts-9527/Claudio_Nuez_-_02_-_Love_ii.mp3",
+    "coverUrl": "https://archive.org/services/img/Love_Hurts-9527",
+    "color": "#f43f5e"
+  },
+  {
+    "title": "Love In the 25th Century",
+    "artist": "The Darkest Love",
+    "album": "Jailbait",
+    "genre": "Other",
+    "duration": 196,
+    "audioUrl": "https://archive.org/download/Jailbait-6206/The_Darkest_Love_-_Love_In_the_25th_Century.mp3",
+    "coverUrl": "https://archive.org/services/img/Jailbait-6206",
+    "color": "#8b5cf6"
+  },
+  {
+    "title": "Mouvement 1",
+    "artist": "Post Mortem Photographs",
+    "album": "Post Mortem Photographs",
+    "genre": "Neoclassic",
+    "duration": 150,
+    "audioUrl": "https://archive.org/download/Post_Mortem_Photographs-12737/Post_Mortem_Photographs_-_01_-_Mouvement_1.mp3",
+    "coverUrl": "https://archive.org/services/img/Post_Mortem_Photographs-12737",
+    "color": "#ec4899"
+  },
+  {
+    "title": "Christmas in Camp [c. 1917]",
+    "artist": "Various Artists [Dawn of Sound]",
+    "album": "Voices of Christmas Past",
+    "genre": "Old-Time / Historic",
+    "duration": 375,
+    "audioUrl": "https://archive.org/download/Voices_of_Christmas_Past-8037/Anonymous_-_21_-_Christmas_in_Camp_c_1917.mp3",
+    "coverUrl": "https://archive.org/services/img/Voices_of_Christmas_Past-8037",
+    "color": "#22d3ee"
+  },
+  {
+    "title": "Christmas Time at Pumpkin Center [1905]",
+    "artist": "Various Artists [Dawn of Sound]",
+    "album": "Voices of Christmas Past",
+    "genre": "Old-Time / Historic",
+    "duration": 164,
+    "audioUrl": "https://archive.org/download/Voices_of_Christmas_Past-8037/Cal_Stewart_-_07_-_Christmas_Time_at_Pumpkin_Center_1905.mp3",
+    "coverUrl": "https://archive.org/services/img/Voices_of_Christmas_Past-8037",
+    "color": "#f59e0b"
+  },
+  {
+    "title": "The Man In The Picture",
+    "artist": "Niamh de Barra",
+    "album": "Below The Sea",
+    "genre": "Electronic",
+    "duration": 223,
+    "audioUrl": "https://archive.org/download/Below_The_Sea-11918/Niamh_De_Barra_-_01_-_The_Man_In_The_Picture.mp3",
+    "coverUrl": "https://archive.org/services/img/Below_The_Sea-11918",
+    "color": "#34d399"
+  },
+  {
+    "title": "Big Day For The Hunter",
+    "artist": "Niamh de Barra",
+    "album": "Below The Sea",
+    "genre": "Electronic",
+    "duration": 241,
+    "audioUrl": "https://archive.org/download/Below_The_Sea-11918/Niamh_De_Barra_-_02_-_Big_Day_For_The_Hunter.mp3",
+    "coverUrl": "https://archive.org/services/img/Below_The_Sea-11918",
+    "color": "#6366f1"
+  },
+  {
+    "title": "Upward",
+    "artist": "junior85",
+    "album": "OnwardandUpward",
+    "genre": "Other",
+    "duration": 305,
+    "audioUrl": "https://archive.org/download/OnwardUpward-13786/junior85_-_02_-_Upward.mp3",
+    "coverUrl": "https://archive.org/services/img/OnwardUpward-13786",
+    "color": "#f43f5e"
+  },
+  {
+    "title": "All Ears",
+    "artist": "Jan Morgenstern",
+    "album": "Big Buck Bunny",
+    "genre": "Composed Music",
+    "duration": 91,
+    "audioUrl": "https://archive.org/download/Big_Buck_Bunny-13302/Jan_Morgenstern_-_02_-_All_Ears.mp3",
+    "coverUrl": "https://archive.org/services/img/Big_Buck_Bunny-13302",
+    "color": "#8b5cf6"
+  },
+  {
+    "title": "The novel I never wrote (Audiobook by Vate)",
+    "artist": "Vate",
+    "album": "Porno Pixel",
+    "genre": "Electronic",
+    "duration": 342,
+    "audioUrl": "https://archive.org/download/Porno_Pixel-3321/Destreza_-_05_-_The_novel_I_never_wrote_Audiobook_by_Vate.mp3",
+    "coverUrl": "https://archive.org/services/img/Porno_Pixel-3321",
+    "color": "#ec4899"
+  },
+  {
+    "title": "Crisis de Identidad \\#1749 (Identidad \\#2006 por Vate)",
+    "artist": "Vate",
+    "album": "Porno Pixel",
+    "genre": "Electronic",
+    "duration": 331,
+    "audioUrl": "https://archive.org/download/Porno_Pixel-3321/Deus_Ex_Machina_-_04_-_Crisis_de_Identidad_1749_Identidad_2006_por_Vate.mp3",
+    "coverUrl": "https://archive.org/services/img/Porno_Pixel-3321",
+    "color": "#22d3ee"
+  },
+  {
+    "title": "Stereo-vision radio",
+    "artist": "Monopole",
+    "album": "Silent movie surround sound",
+    "genre": "IDM",
+    "duration": 496,
+    "audioUrl": "https://archive.org/download/Silent_movie_surround_sound-5031/Monopole_-_02_-_Stereo-vision_radio.mp3",
+    "coverUrl": "https://archive.org/services/img/Silent_movie_surround_sound-5031",
+    "color": "#f59e0b"
+  },
+  {
+    "title": "Bending You",
+    "artist": "Pablo Ribot",
+    "album": "Sci-Fi Vol.1",
+    "genre": null,
+    "duration": 136,
+    "audioUrl": "https://archive.org/download/Sci-Fi_Vol1-9802/Pablo_Ribot_-_01_-_Bending_You.mp3",
+    "coverUrl": "https://archive.org/services/img/Sci-Fi_Vol1-9802",
+    "color": "#34d399"
+  },
+  {
+    "title": "Timeless Space",
+    "artist": "Pablo Ribot",
+    "album": "Sci-Fi Vol.1",
+    "genre": null,
+    "duration": 156,
+    "audioUrl": "https://archive.org/download/Sci-Fi_Vol1-9802/Pablo_Ribot_-_02_-_Timeless_Space.mp3",
+    "coverUrl": "https://archive.org/services/img/Sci-Fi_Vol1-9802",
+    "color": "#6366f1"
+  },
+  {
+    "title": "03",
+    "artist": "Classwar Karaoke",
+    "album": "Classwar Karaoke - 0021 Survey",
+    "genre": "Avant-Garde",
+    "duration": 50,
+    "audioUrl": "https://archive.org/download/Classwar_Karaoke_-_0021_Survey-13652/02_Elements_-_01_-_03.mp3",
+    "coverUrl": "https://archive.org/services/img/Classwar_Karaoke_-_0021_Survey-13652",
+    "color": "#f43f5e"
+  },
+  {
+    "title": "I am rich",
+    "artist": "Naran",
+    "album": "Feel Free:::::ze",
+    "genre": "Drone",
+    "duration": 240,
+    "audioUrl": "https://archive.org/download/Feel_Freeze-9508/Naran_-_01_-_I_am_rich.mp3",
+    "coverUrl": "https://archive.org/services/img/Feel_Freeze-9508",
+    "color": "#8b5cf6"
+  },
+  {
+    "title": "Sister D2",
+    "artist": "Naran",
+    "album": "Feel Free:::::ze",
+    "genre": "Drone",
+    "duration": 420,
+    "audioUrl": "https://archive.org/download/Feel_Freeze-9508/Naran_-_02_-_Sister_D2.mp3",
+    "coverUrl": "https://archive.org/services/img/Feel_Freeze-9508",
+    "color": "#ec4899"
+  },
+  {
+    "title": "Split Splat!",
+    "artist": "Spitball",
+    "album": "The Last Straw",
+    "genre": "Hip-Hop",
+    "duration": 85,
+    "audioUrl": "https://archive.org/download/The_Last_Straw-6527/Spitball_-_01_-_Split_Splat.mp3",
+    "coverUrl": "https://archive.org/services/img/The_Last_Straw-6527",
+    "color": "#22d3ee"
+  },
+  {
+    "title": "Nasty Habit",
+    "artist": "Spitball",
+    "album": "The Last Straw",
+    "genre": "Hip-Hop",
+    "duration": 133,
+    "audioUrl": "https://archive.org/download/The_Last_Straw-6527/Spitball_-_02_-_Nasty_Habit.mp3",
+    "coverUrl": "https://archive.org/services/img/The_Last_Straw-6527",
+    "color": "#f59e0b"
+  },
+  {
+    "title": "I Got A Melody",
+    "artist": "Talkshow Boy",
+    "album": "Testosterone!",
+    "genre": null,
+    "duration": 87,
+    "audioUrl": "https://archive.org/download/Testosterone-11904/Talkshow_Boy_-_01_-_I_Got_A_Melody.mp3",
+    "coverUrl": "https://archive.org/services/img/Testosterone-11904",
+    "color": "#34d399"
+  },
+  {
+    "title": "Testosterone",
+    "artist": "Talkshow Boy",
+    "album": "Testosterone!",
+    "genre": null,
+    "duration": 159,
+    "audioUrl": "https://archive.org/download/Testosterone-11904/Talkshow_Boy_-_02_-_Testosterone.mp3",
+    "coverUrl": "https://archive.org/services/img/Testosterone-11904",
+    "color": "#6366f1"
+  },
+  {
+    "title": "Ain't No Joke",
+    "artist": "Cheese N Pot-C",
+    "album": "Cheese N Pot-C Buffet XE",
+    "genre": "Hip-Hop",
+    "duration": 246,
+    "audioUrl": "https://archive.org/download/Cheese_N_Pot-C_Buffet_XE-16884/Cheese_N_Pot-C_-_01_-_Aint_No_Joke.mp3",
+    "coverUrl": "https://archive.org/services/img/Cheese_N_Pot-C_Buffet_XE-16884",
+    "color": "#f43f5e"
+  },
+  {
+    "title": "Arrogant Cobbler (Nero's Day At Disneyland - Rock Rock Rock Remix)",
+    "artist": "DJ Donna Summer",
+    "album": "Rock Rock Rock Remixes",
+    "genre": "Techno",
+    "duration": 168,
+    "audioUrl": "https://archive.org/download/Rock_Rock_Rock_Remixes-3302/DJ_Donna_Summer_-_Arrogant_Cobbler_Neros_Day_At_Disneyland_-_Rock_Rock_Rock_Remix.mp3",
+    "coverUrl": "https://archive.org/services/img/Rock_Rock_Rock_Remixes-3302",
+    "color": "#8b5cf6"
+  },
+  {
+    "title": "Fuck Fuck Fuck (DJ C Mix)",
+    "artist": "DJ Donna Summer",
+    "album": "Rock Rock Rock Remixes",
+    "genre": "Techno",
+    "duration": 269,
+    "audioUrl": "https://archive.org/download/Rock_Rock_Rock_Remixes-3302/DJ_Donna_Summer_-_Fuck_Fuck_Fuck_DJ_C_Mix.mp3",
+    "coverUrl": "https://archive.org/services/img/Rock_Rock_Rock_Remixes-3302",
+    "color": "#ec4899"
+  }
+]

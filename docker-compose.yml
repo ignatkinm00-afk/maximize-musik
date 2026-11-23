@@ -1,0 +1,23 @@
+services:
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '8787:8787'
+    environment:
+      NODE_ENV: production
+      PORT: 8787
+      DATA_DIR: /data
+      JWT_SECRET: ${JWT_SECRET:-change-me-please}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@maximize.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin12345}
+      DATABASE_URL: ${DATABASE_URL:-}
+      WEB_URL: ${WEB_URL:-http://localhost:5173}
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_WEBHOOK_URL: ${TELEGRAM_WEBHOOK_URL:-}
+    volumes:
+      - maximize_data:/data
+
+volumes:
+  maximize_data:
