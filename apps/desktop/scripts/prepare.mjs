@@ -26,9 +26,20 @@ fs.mkdirSync(target, { recursive: true });
 fs.cpSync(dist, target, { recursive: true });
 
 // Service worker не нужен внутри Electron и может мешать file://.
-for (const name of ['sw.js', 'registerSW.js', 'manifest.webmanifest']) {
-  const file = path.join(target, name);
-  if (fs.existsSync(file)) fs.rmSync(file);
+for (const name of fs.readdirSync(target)) {
+  if (/^(sw|registerSW|manifest|workbox-)/.test(name)) {
+    fs.rmSync(path.join(target, name), { recursive: true, force: true });
+  }
+}
+
+// Убираем ссылки на удалённые файлы из HTML.
+const indexPath = path.join(target, 'index.html');
+if (fs.existsSync(indexPath)) {
+  const html = fs
+    .readFileSync(indexPath, 'utf8')
+    .replace(/\s*<link rel="manifest"[^>]*>/g, '')
+    .replace(/\s*<script[^>]*registerSW[^>]*><\/script>/g, '');
+  fs.writeFileSync(indexPath, html);
 }
 
 console.log(`✔ Renderer готов: ${path.relative(root, target)}`);

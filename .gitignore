@@ -20,4 +20,5 @@ coverage/
 .npm/
 .electron-cache/
 .electron-builder-cache/
+.eb-cache2/
 .edge-profile/
