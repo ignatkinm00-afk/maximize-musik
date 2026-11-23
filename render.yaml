@@ -15,23 +15,7 @@ services:
         value: admin@maximize.local
       - key: ADMIN_PASSWORD
         sync: false
-      - key: DATABASE_URL
-        sync: false
       - key: WEB_URL
-        sync: false
-      - key: PUBLIC_API_URL
-        sync: false
+        value: https://ignatkinm00-afk.github.io/maximize-musik/
       - key: CORS_ORIGINS
         value: '*'
-      - key: TELEGRAM_BOT_TOKEN
-        sync: false
-      - key: TELEGRAM_WEBHOOK_URL
-        sync: false
-      - key: TELEGRAM_WEBHOOK_SECRET
-        generateValue: true
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_KEY
-        sync: false
-      - key: SUPABASE_BUCKET
-        value: maximize-media

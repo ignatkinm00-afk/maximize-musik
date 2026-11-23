@@ -6,6 +6,11 @@
 **APK:** [скачать из Releases](https://github.com/ignatkinm00-afk/maximize-musik/releases/latest)
 **Репозиторий:** https://github.com/ignatkinm00-afk/maximize-musik
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ignatkinm00-afk/maximize-musik)
+
+> Сайт и APK уже опубликованы, но без backend логин не работает. Нажми кнопку выше —
+> Render поднимет API бесплатно за пару минут (нужен только аккаунт Render через GitHub).
+
 Полноценный музыкальный сервис: каталог, поиск, плеер с очередью, лайки, плейлисты,
 загрузка своих треков, уведомления, админ-панель и Telegram-бот с Mini App.
 Один монорепозиторий — четыре платформы.
