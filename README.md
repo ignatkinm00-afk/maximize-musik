@@ -151,10 +151,16 @@ maximize-musik/
 
 ### Как хранится музыка
 
-Демо-каталог собран из **Free Music Archive** (коллекция Internet Archive, лицензии
-Creative Commons). В базе лежат ссылки на оригинальные MP3, а API проксирует их через
-`/api/tracks/:id/stream` с поддержкой `Range` — поэтому работают перемотка и стриминг
-без CORS-проблем. `catalog.json` коммитится, чтобы приложение запускалось без сети.
+Каталог берётся из **Audius API** (`/v1/tracks/trending`) при первом запуске сервера:
+150–200 треков, обложки и жанры — оттуда. Audius может блокировать отдельные страны и
+дата-центры (Cloudflare 403), поэтому есть фолбэк — локальный `catalog.json` с записями
+**Free Music Archive** (Creative Commons). Если сервер не смог достучаться до Audius,
+он поднимет фолбэк, а администратор сможет позже нажать **«Audius»** в админке
+(`POST /api/admin/catalog/audius`) — импорт повторится с сервера.
+
+API проксирует аудио через `/api/tracks/:id/stream` с поддержкой `Range` — работают
+перемотка и стриминг без CORS-проблем. Ссылки Audius отдают 302 на CDN, прокси это
+корректно обрабатывает.
 
 Пользовательские загрузки по умолчанию хранятся в `apps/api/data/uploads`.
 В продакшене включи Supabase Storage (`SUPABASE_URL`, `SUPABASE_SERVICE_KEY`) —
@@ -182,6 +188,8 @@ Creative Commons). В базе лежат ссылки на оригинальн
 | `TELEGRAM_WEBHOOK_SECRET` | `maximize-webhook` | секрет заголовка Telegram |
 | `SUPABASE_URL` / `SUPABASE_SERVICE_KEY` | — | хранение загрузок |
 | `SUPABASE_BUCKET` | `maximize-media` | бакет Storage |
+| `AUDIUS_APP_NAME` | `MaximizeMusik` | app_name для Audius API |
+| `AUDIUS_API_BASE` | `https://api.audius.co` | базовый URL Audius |
 | `VITE_API_URL` | — | адрес API для веб-сборки (GitHub Pages) |
 
 ---
@@ -347,9 +355,10 @@ API будет на `:8787`, данные — в томе `maximize_data`. По�
 
 ## Музыка и лицензии
 
-- Демо-каталог — записи **Free Music Archive** (Internet Archive) с лицензиями
-  Creative Commons. Права принадлежат авторам; при публичном запуске сохраняй
-  атрибуцию и проверяй условия конкретной лицензии (BY / BY-SA / BY-NC и т.д.).
+- Основной источник — **Audius** (публичный API). Треки загружены исполнителями; перед
+  коммерческим запуском проверь условия Audius и права на конкретные записи.
+- Фолбэк-каталог — **Free Music Archive** (Internet Archive) с лицензиями Creative
+  Commons; сохраняй атрибуцию авторов.
 - Пользовательские загрузки: только своя музыка или файлы со свободной лицензией.
   Пользовательские треки не публикуются без проверки администратором.
 - Проект не содержит и не ищет пиратский контент. Ссылки на сторонние каталоги

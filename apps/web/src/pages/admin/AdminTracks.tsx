@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { Pencil, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { api } from '../../lib/api';
 import { formatCount, formatTime } from '../../lib/format';
@@ -29,6 +29,7 @@ export function AdminTracks() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<Track | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -107,6 +108,24 @@ export function AdminTracks() {
     }
   };
 
+  const importAudius = async () => {
+    setImporting(true);
+    try {
+      const result = await api.adminImportAudius();
+      await load();
+      pushToast(
+        result.added > 0
+          ? `Из Audius добавлено ${result.added} треков (всего ${result.total})`
+          : `Audius: новых треков нет (проверено ${result.fetched})`,
+        'success',
+      );
+    } catch (error) {
+      pushToast((error as Error).message, 'error');
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <div className="admin-stack">
       <div className="admin-toolbar">
@@ -127,6 +146,9 @@ export function AdminTracks() {
             { value: 'draft', label: 'Черновики' },
           ]}
         />
+        <button className="btn btn-ghost" onClick={() => void importAudius()} disabled={importing}>
+          {importing ? <Spinner size={16} /> : <RefreshCw size={16} />} Audius
+        </button>
         <button className="btn btn-primary" onClick={() => setCreateOpen(true)}>
           <Plus size={16} /> Добавить трек
         </button>

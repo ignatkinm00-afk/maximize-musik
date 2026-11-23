@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { fetchAudiusCatalog } from '../db/audius.ts';
+import { insertCatalogTracks } from '../db/bootstrap.ts';
 import type { Database } from '../db/index.ts';
 import { nowIso } from '../db/index.ts';
 import { requireAdmin, type UserRow } from '../lib/auth.ts';
@@ -246,6 +248,17 @@ export async function registerAdminRoutes(app: FastifyInstance, db: Database): P
     await db.run('DELETE FROM plays WHERE track_id = ?', [id]);
     await db.run('DELETE FROM tracks WHERE id = ?', [id]);
     return { ok: true };
+  });
+
+  app.post('/api/admin/catalog/audius', async (req) => {
+    await requireAdmin(req, db);
+    const catalog = await fetchAudiusCatalog(150);
+    if (catalog.length === 0) throw badRequest('Audius вернул пустой каталог');
+    const added = await insertCatalogTracks(db, catalog, { skipExisting: true });
+    const total = await db.get<{ total: number | string }>(
+      'SELECT COUNT(*) AS total FROM tracks',
+    );
+    return { fetched: catalog.length, added, total: Number(total?.total ?? 0) };
   });
 
   app.get('/api/admin/notifications', async (req) => {
