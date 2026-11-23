@@ -1,12 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { fetchAudiusCatalog } from '../db/audius.ts';
 import { insertCatalogTracks } from '../db/bootstrap.ts';
+import { catalogSourcesStatus, fetchCatalog } from '../db/sources.ts';
 import type { Database } from '../db/index.ts';
 import { nowIso } from '../db/index.ts';
 import { requireAdmin, type UserRow } from '../lib/auth.ts';
-import { badRequest, notFound } from '../lib/errors.ts';
+import { badRequest, HttpError, notFound } from '../lib/errors.ts';
 import { mapNotification, mapTrack, type NotificationRow, type TrackRow } from '../lib/mappers.ts';
 import { telegram } from '../lib/telegram.ts';
 import { parse, pagination } from '../lib/validate.ts';
@@ -250,15 +250,35 @@ export async function registerAdminRoutes(app: FastifyInstance, db: Database): P
     return { ok: true };
   });
 
-  app.post('/api/admin/catalog/audius', async (req) => {
+  app.get('/api/admin/catalog/sources', async (req) => {
     await requireAdmin(req, db);
-    const catalog = await fetchAudiusCatalog(150);
-    if (catalog.length === 0) throw badRequest('Audius вернул пустой каталог');
+    return { sources: catalogSourcesStatus() };
+  });
+
+  app.post('/api/admin/catalog/import', async (req) => {
+    await requireAdmin(req, db);
+    const body = parse(
+      z.object({ source: z.enum(['audius', 'jamendo', 'fma']) }),
+      req.body,
+    );
+    const catalog = await fetchCatalog(body.source).catch((error: Error) => {
+      throw new HttpError(
+        502,
+        `Источник «${body.source}» недоступен: ${error.message}`,
+        'source_unavailable',
+      );
+    });
+    if (catalog.length === 0) throw badRequest('Источник вернул пустой каталог');
     const added = await insertCatalogTracks(db, catalog, { skipExisting: true });
     const total = await db.get<{ total: number | string }>(
       'SELECT COUNT(*) AS total FROM tracks',
     );
-    return { fetched: catalog.length, added, total: Number(total?.total ?? 0) };
+    return {
+      source: body.source,
+      fetched: catalog.length,
+      added,
+      total: Number(total?.total ?? 0),
+    };
   });
 
   app.get('/api/admin/notifications', async (req) => {

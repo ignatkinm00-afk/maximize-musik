@@ -211,10 +211,20 @@ export const api = {
     request<{ track: Track }>(`/api/admin/tracks/${id}`, { method: 'PATCH', body: data }),
   adminDeleteTrack: (id: string) =>
     request<{ ok: boolean }>(`/api/admin/tracks/${id}`, { method: 'DELETE' }),
-  adminImportAudius: () =>
-    request<{ fetched: number; added: number; total: number }>('/api/admin/catalog/audius', {
-      body: {},
-    }),
+  adminCatalogSources: () =>
+    request<{
+      sources: Array<{
+        id: 'audius' | 'jamendo' | 'fma';
+        label: string;
+        configured: boolean;
+        hint: string;
+      }>;
+    }>('/api/admin/catalog/sources'),
+  adminImportCatalog: (source: 'audius' | 'jamendo' | 'fma') =>
+    request<{ source: string; fetched: number; added: number; total: number }>(
+      '/api/admin/catalog/import',
+      { body: { source } },
+    ),
   adminNotifications: (limit = 30, offset = 0) =>
     request<{ notifications: AppNotification[]; total: number; bot: { configured: boolean; live: boolean } }>(
       `/api/admin/notifications?limit=${limit}&offset=${offset}`,

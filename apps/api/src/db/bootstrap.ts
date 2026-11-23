@@ -1,9 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import fs from 'node:fs';
-import path from 'node:path';
 import { config } from '../config.ts';
 import { hashPassword } from '../lib/auth.ts';
-import { fetchAudiusCatalog, type CatalogTrack } from './audius.ts';
+import type { CatalogTrack, CatalogSource } from './sources.ts';
+import { fetchCatalog } from './sources.ts';
 import type { Database } from './index.ts';
 import { nowIso } from './index.ts';
 
@@ -78,24 +77,21 @@ export async function ensureCatalog(db: Database): Promise<void> {
   const row = await db.get<{ total: number | string }>('SELECT COUNT(*) AS total FROM tracks');
   if (Number(row?.total ?? 0) > 0) return;
 
-  let catalog: CatalogTrack[] = [];
-  try {
-    catalog = await fetchAudiusCatalog(100);
-    console.log(`[catalog] Audius: получено треков ${catalog.length}`);
-  } catch (error) {
-    console.warn(`[catalog] Audius недоступен: ${(error as Error).message}`);
-  }
-
-  if (catalog.length < 10) {
-    const file = path.join(import.meta.dirname, 'catalog.json');
-    if (!fs.existsSync(file)) {
-      console.log('[catalog] локальный catalog.json не найден — каталог пуст');
+  const order: CatalogSource[] = ['audius', 'jamendo', 'fma'];
+  for (const source of order) {
+    try {
+      const catalog = await fetchCatalog(source);
+      if (catalog.length < 10) {
+        console.log(`[catalog] ${source}: слишком мало треков (${catalog.length}), пробую следующий`);
+        continue;
+      }
+      const added = await insertCatalogTracks(db, catalog);
+      console.log(`[catalog] источник ${source}: загружено ${added} треков`);
       return;
+    } catch (error) {
+      console.warn(`[catalog] ${source} недоступен: ${(error as Error).message}`);
     }
-    catalog = JSON.parse(fs.readFileSync(file, 'utf8')) as CatalogTrack[];
-    console.log(`[catalog] фолбэк: локальный каталог (${catalog.length} треков)`);
   }
 
-  const added = await insertCatalogTracks(db, catalog);
-  console.log(`[catalog] загружено треков: ${added}`);
+  console.log('[catalog] ни один источник не дал каталог — приложение стартует пустым');
 }

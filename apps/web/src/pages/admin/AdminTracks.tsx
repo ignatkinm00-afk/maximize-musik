@@ -30,6 +30,10 @@ export function AdminTracks() {
   const [deleting, setDeleting] = useState<Track | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
+  const [sources, setSources] = useState<
+    Array<{ id: 'audius' | 'jamendo' | 'fma'; label: string; configured: boolean; hint: string }>
+  >([]);
+  const [source, setSource] = useState<'audius' | 'jamendo' | 'fma'>('audius');
 
   const load = async () => {
     setLoading(true);
@@ -108,15 +112,22 @@ export function AdminTracks() {
     }
   };
 
-  const importAudius = async () => {
+  useEffect(() => {
+    api
+      .adminCatalogSources()
+      .then((data) => setSources(data.sources))
+      .catch(() => undefined);
+  }, []);
+
+  const importCatalog = async () => {
     setImporting(true);
     try {
-      const result = await api.adminImportAudius();
+      const result = await api.adminImportCatalog(source);
       await load();
       pushToast(
         result.added > 0
-          ? `Из Audius добавлено ${result.added} треков (всего ${result.total})`
-          : `Audius: новых треков нет (проверено ${result.fetched})`,
+          ? `${source}: добавлено ${result.added} треков (всего ${result.total})`
+          : `${source}: новых треков нет (проверено ${result.fetched})`,
         'success',
       );
     } catch (error) {
@@ -146,8 +157,30 @@ export function AdminTracks() {
             { value: 'draft', label: 'Черновики' },
           ]}
         />
-        <button className="btn btn-ghost" onClick={() => void importAudius()} disabled={importing}>
-          {importing ? <Spinner size={16} /> : <RefreshCw size={16} />} Audius
+        <select
+          className="input select-compact"
+          value={source}
+          onChange={(event) =>
+            setSource(event.target.value as 'audius' | 'jamendo' | 'fma')
+          }
+          title={sources.find((item) => item.id === source)?.hint ?? 'Источник каталога'}
+        >
+          {(sources.length
+            ? sources
+            : ([
+                { id: 'audius', label: 'Audius', configured: true, hint: '' },
+                { id: 'jamendo', label: 'Jamendo', configured: true, hint: '' },
+                { id: 'fma', label: 'Free Music Archive', configured: true, hint: '' },
+              ] as const)
+          ).map((item) => (
+            <option key={item.id} value={item.id} disabled={!item.configured}>
+              {item.label}
+              {item.configured ? '' : ' — нет ключа'}
+            </option>
+          ))}
+        </select>
+        <button className="btn btn-ghost" onClick={() => void importCatalog()} disabled={importing}>
+          {importing ? <Spinner size={16} /> : <RefreshCw size={16} />} Импорт
         </button>
         <button className="btn btn-primary" onClick={() => setCreateOpen(true)}>
           <Plus size={16} /> Добавить трек
