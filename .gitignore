@@ -15,7 +15,7 @@ Thumbs.db
 .vite/
 coverage/
 .tmp/
-screenshots/
+/screenshots/
 .npm-cache/
 .npm/
 .electron-cache/
