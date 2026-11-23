@@ -2,6 +2,10 @@
 
 **Музыка без подписки — на телефоне, в Windows и прямо в Telegram.**
 
+**Сайт:** https://ignatkinm00-afk.github.io/maximize-musik/
+**APK:** [скачать из Releases](https://github.com/ignatkinm00-afk/maximize-musik/releases/latest)
+**Репозиторий:** https://github.com/ignatkinm00-afk/maximize-musik
+
 Полноценный музыкальный сервис: каталог, поиск, плеер с очередью, лайки, плейлисты,
 загрузка своих треков, уведомления, админ-панель и Telegram-бот с Mini App.
 Один монорепозиторий — четыре платформы.
