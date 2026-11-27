@@ -13,6 +13,10 @@ try {
 }
 
 const trim = (v: string | undefined) => (v ?? '').trim();
+const r2AccountId = trim(process.env.R2_ACCOUNT_ID);
+const r2Endpoint =
+  trim(process.env.R2_ENDPOINT).replace(/\/$/, '') ||
+  (r2AccountId ? `https://${r2AccountId}.r2.cloudflarestorage.com` : '');
 
 const publicApiUrl = (
   trim(process.env.PUBLIC_API_URL) ||
@@ -42,7 +46,8 @@ export const config = {
     bucket: trim(process.env.SUPABASE_BUCKET) || 'maximize-media',
   },
   r2: {
-    accountId: trim(process.env.R2_ACCOUNT_ID),
+    accountId: r2AccountId,
+    endpoint: r2Endpoint,
     accessKeyId: trim(process.env.R2_ACCESS_KEY_ID),
     secretAccessKey: trim(process.env.R2_SECRET_ACCESS_KEY),
     bucket: trim(process.env.R2_BUCKET) || 'maximize-music',

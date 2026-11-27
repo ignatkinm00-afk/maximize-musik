@@ -37,6 +37,8 @@ export function EqualizerDialog() {
   const setSleepTimer = usePlayer((state) => state.setSleepTimer);
   const crossfade = usePlayer((state) => state.crossfade);
   const setCrossfade = usePlayer((state) => state.setCrossfade);
+  const gapless = usePlayer((state) => state.gapless);
+  const setGapless = usePlayer((state) => state.setGapless);
 
   const activePreset = PRESET_LABELS.find(([id]) => {
     const preset = EQ_PRESETS[id]!;
@@ -190,6 +192,18 @@ export function EqualizerDialog() {
             ))}
           </div>
           <p className="hint">Плавное затухание в конце трека и появление следующего.</p>
+        </div>
+
+        <div className="eq-boost-head">
+          <span>Gapless (без пауз)</span>
+          <button
+            className={`switch ${gapless ? 'on' : ''}`}
+            onClick={() => setGapless(!gapless)}
+            aria-pressed={gapless}
+            aria-label="Gapless"
+          >
+            <span />
+          </button>
         </div>
 
         <div className="eq-boost-head">

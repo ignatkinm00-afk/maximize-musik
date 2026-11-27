@@ -34,12 +34,12 @@
 - Автосезонность, анимированные фоны (снег, лепестки, неон, туман, блоки),
   свой акцент, обои, магазин тем за XP и превью.
 - Плеер: 10-полосный эквалайзер, скорость 0.5–2×, таймер сна, нормализация,
-  плавные переходы, живой визуализатор, офлайн-скачивание.
+  плавные переходы, gapless-прелоад, живой визуализатор, офлайн-скачивание.
 - Тексты песен (LRC) и комментарии к трекам.
 - Профили, подписки, лента, общие плейлисты, комнаты совместного прослушивания.
 - «Для тебя» / Daily Mix, радио, итоги года.
 - Геймификация: XP, уровни, ачивки, стрики, рейтинг.
-- Android-виджет на рабочий стол.
+- Android-виджет на рабочий стол и точка входа в Android Auto.
 - Postgres через `DATABASE_URL` — данные переживают перезапуск Render.
 
 ### Postgres за 5 минут
@@ -261,6 +261,7 @@ npm run music:add -- "C:\Users\Digma\Music" --push
 | `R2_ACCOUNT_ID` | — | Cloudflare R2: Account ID |
 | `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | — | Cloudflare R2: ключи API-токена |
 | `R2_BUCKET` | `maximize-music` | имя бакета R2 |
+| `R2_ENDPOINT` | — | необязательно: endpoint для EU/US jurisdiction |
 | `R2_PUBLIC_URL` | — | публичный домен бакета (`https://pub-….r2.dev`) |
 | `AUDIUS_APP_NAME` | `MaximizeMusik` | app_name для Audius API |
 | `AUDIUS_API_BASE` | `https://api.audius.co` | базовый URL Audius |

@@ -103,7 +103,7 @@ export async function listR2Objects(
     if (prefix) query.set('prefix', prefix);
     if (continuationToken) query.set('continuation-token', continuationToken);
 
-    const endpoint = `https://${config.r2.accountId}.r2.cloudflarestorage.com/${config.r2.bucket}?${query.toString()}`;
+    const endpoint = `${config.r2.endpoint}/${config.r2.bucket}?${query.toString()}`;
     const response = await client.fetch(endpoint, { method: 'GET' });
     if (!response.ok) {
       const detail = await response.text().catch(() => '');
@@ -140,7 +140,7 @@ async function saveToR2(
     region: 'auto',
   });
 
-  const endpoint = `https://${config.r2.accountId}.r2.cloudflarestorage.com/${config.r2.bucket}/${objectPath}`;
+  const endpoint = `${config.r2.endpoint}/${config.r2.bucket}/${objectPath}`;
   const response = await client.fetch(endpoint, {
     method: 'PUT',
     headers: {

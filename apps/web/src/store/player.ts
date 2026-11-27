@@ -36,6 +36,7 @@ interface PlayerState {
   normalize: boolean;
   sleepUntil: number | null;
   crossfade: number;
+  gapless: boolean;
   offlineIds: string[];
 
   playTrack: (track: Track, queue?: Track[]) => void;
@@ -59,6 +60,7 @@ interface PlayerState {
   setNormalize: (enabled: boolean) => void;
   setSleepTimer: (minutes: number | null) => void;
   setCrossfade: (seconds: number) => void;
+  setGapless: (enabled: boolean) => void;
   refreshOffline: () => Promise<void>;
   downloadTrack: (track: Track) => Promise<OfflineTrack>;
   removeDownload: (id: string) => Promise<void>;
@@ -73,6 +75,134 @@ let sleepTimeout: number | null = null;
 let playToken = 0;
 let fadeTimer: number | null = null;
 let fadingOut = false;
+let preloadToken = 0;
+let preloaded: { track: Track; url: string; index: number; owned: boolean } | null = null;
+let activeBlobUrl: string | null = null;
+
+type PreloadCandidate = { track: Track; index: number };
+
+function nextCandidate(state: {
+  queue: Track[];
+  index: number;
+  repeat: RepeatMode;
+  shuffle: boolean;
+}): PreloadCandidate | null {
+  if (!state.queue.length || state.index < 0) return null;
+  if (state.repeat === 'one') {
+    return { track: state.queue[state.index]!, index: state.index };
+  }
+  if (state.shuffle && state.queue.length > 1) {
+    let index = state.index;
+    while (index === state.index) {
+      index = Math.floor(Math.random() * state.queue.length);
+    }
+    return { track: state.queue[index]!, index };
+  }
+  const next = state.index + 1;
+  if (next >= state.queue.length) {
+    return state.repeat === 'all'
+      ? { track: state.queue[0]!, index: 0 }
+      : null;
+  }
+  return { track: state.queue[next]!, index: next };
+}
+
+function clearPreload(): void {
+  preloadToken += 1;
+  if (preloaded) {
+    if (preloaded.owned) URL.revokeObjectURL(preloaded.url);
+    preloaded = null;
+  }
+}
+
+async function preloadNext(): Promise<void> {
+  const state = usePlayer.getState();
+  if (!state.gapless) return;
+  const candidate = nextCandidate(state);
+  if (!candidate) return;
+
+  const token = ++preloadToken;
+  try {
+    let url = streamUrl(candidate.track);
+    let owned = false;
+
+    if (state.offlineIds.includes(candidate.track.id)) {
+      const offline = await offlineObjectUrl(candidate.track.id).catch(() => null);
+      if (offline) url = offline;
+    } else {
+      const response = await fetch(url);
+      if (!response.ok) return;
+      const blob = await response.blob();
+      if (blob.size < 1024) return;
+      url = URL.createObjectURL(blob);
+      owned = true;
+    }
+
+    if (token !== preloadToken) {
+      if (owned) URL.revokeObjectURL(url);
+      return;
+    }
+
+    if (preloaded?.owned) URL.revokeObjectURL(preloaded.url);
+    preloaded = { track: candidate.track, url, index: candidate.index, owned };
+  } catch {
+    // прелоад не критичен
+  }
+}
+
+function setMediaSession(track: Track): void {
+  if (!('mediaSession' in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: track.artist,
+      album: track.album ?? 'Maximize Musik',
+      artwork: track.coverUrl
+        ? [{ src: mediaUrl(track.coverUrl), sizes: '512x512', type: 'image/jpeg' }]
+        : [],
+    });
+    navigator.mediaSession.playbackState = 'playing';
+  } catch {
+    // ignore
+  }
+}
+
+function activatePreloaded(): boolean {
+  const item = preloaded;
+  if (!item) return false;
+  preloaded = null;
+
+  if (activeBlobUrl) URL.revokeObjectURL(activeBlobUrl);
+  activeBlobUrl = item.owned ? item.url : null;
+
+  usePlayer.setState({
+    current: item.track,
+    index: item.index,
+    playing: true,
+    time: 0,
+    duration: item.track.duration || 0,
+    loading: true,
+  });
+  lastRecorded = '';
+  lastErrorTrack = '';
+  setMediaSession(item.track);
+
+  audio.removeAttribute('crossorigin');
+  audio.src = item.url;
+  audio.currentTime = 0;
+  audio.volume = 0;
+  audio.load();
+  void audio
+    .play()
+    .then(() => {
+      usePlayer.setState({ playing: true, loading: false });
+      fadeAudio(Math.min(1, usePlayer.getState().volume), 300);
+      void preloadNext();
+    })
+    .catch(() => usePlayer.setState({ playing: false, loading: false }));
+
+  return true;
+}
 
 function fadeAudio(target: number, duration: number): void {
   if (fadeTimer) window.clearInterval(fadeTimer);
@@ -154,6 +284,7 @@ export const usePlayer = create<PlayerState>()(
       normalize: false,
       sleepUntil: null,
       crossfade: 0,
+      gapless: true,
       offlineIds: [],
 
       playTrack: (track, queue) => {
@@ -173,6 +304,11 @@ export const usePlayer = create<PlayerState>()(
         );
         lastRecorded = '';
         lastErrorTrack = '';
+        clearPreload();
+        if (activeBlobUrl) {
+          URL.revokeObjectURL(activeBlobUrl);
+          activeBlobUrl = null;
+        }
         set({
           queue: nextQueue,
           index,
@@ -190,22 +326,8 @@ export const usePlayer = create<PlayerState>()(
         audioFx.setNormalization(get().normalize);
         audio.playbackRate = get().speed;
         void startPlayback(track);
-
-        if ('mediaSession' in navigator) {
-          try {
-            navigator.mediaSession.metadata = new MediaMetadata({
-              title: track.title,
-              artist: track.artist,
-              album: track.album ?? 'Maximize Musik',
-              artwork: track.coverUrl
-                ? [{ src: mediaUrl(track.coverUrl), sizes: '512x512', type: 'image/jpeg' }]
-                : [],
-            });
-            navigator.mediaSession.playbackState = 'playing';
-          } catch {
-            // ignore
-          }
-        }
+        setMediaSession(track);
+        void preloadNext();
       },
 
       togglePlay: () => {
@@ -298,9 +420,15 @@ export const usePlayer = create<PlayerState>()(
         const order: RepeatMode[] = ['off', 'all', 'one'];
         const nextMode = order[(order.indexOf(get().repeat) + 1) % order.length]!;
         set({ repeat: nextMode });
+        clearPreload();
+        void preloadNext();
       },
 
-      toggleShuffle: () => set({ shuffle: !get().shuffle }),
+      toggleShuffle: () => {
+        set({ shuffle: !get().shuffle });
+        clearPreload();
+        void preloadNext();
+      },
 
       setExpanded: (expanded) => set({ expanded }),
 
@@ -388,6 +516,12 @@ export const usePlayer = create<PlayerState>()(
         set({ crossfade: value });
       },
 
+      setGapless: (enabled) => {
+        set({ gapless: enabled });
+        if (enabled) void preloadNext();
+        else clearPreload();
+      },
+
       refreshOffline: async () => {
         const rows = await listOffline();
         set({ offlineIds: rows.map((row) => row.id) });
@@ -417,6 +551,7 @@ export const usePlayer = create<PlayerState>()(
         speed: state.speed,
         normalize: state.normalize,
         crossfade: state.crossfade,
+        gapless: state.gapless,
       }),
       onRehydrateStorage: () => (state) => {
         if (!state) return;
@@ -472,12 +607,16 @@ audio.addEventListener('playing', () => usePlayer.setState({ loading: false }));
 
 audio.addEventListener('ended', () => {
   fadingOut = false;
-  const { repeat, next } = usePlayer.getState();
-  if (repeat === 'one') {
+  const state = usePlayer.getState();
+  if (state.repeat === 'one') {
     audio.currentTime = 0;
     void audio.play();
     return;
   }
+  if (state.gapless && preloaded) {
+    if (activatePreloaded()) return;
+  }
+  const { next } = state;
   next(true);
 });
 

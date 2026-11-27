@@ -284,6 +284,23 @@ export async function registerAdminRoutes(app: FastifyInstance, db: Database): P
     return { ok: true };
   });
 
+  app.get('/api/admin/storage', async (req) => {
+    await requireAdmin(req, db);
+    const info = {
+      r2Configured: isR2Configured(),
+      endpoint: config.r2.endpoint,
+      bucket: config.r2.bucket,
+      publicUrl: config.r2.publicUrl,
+    };
+    if (!isR2Configured()) return { ...info, ok: false, error: 'R2 не настроен' };
+    try {
+      const objects = await listR2Objects('');
+      return { ...info, ok: true, objects: objects.length };
+    } catch (error) {
+      return { ...info, ok: false, error: (error as Error).message };
+    }
+  });
+
   app.get('/api/admin/catalog/sources', async (req) => {
     await requireAdmin(req, db);
     return { sources: catalogSourcesStatus() };
