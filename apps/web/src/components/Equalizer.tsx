@@ -74,20 +74,23 @@ export function EqualizerDialog() {
                 {gain > 0 ? '+' : ''}
                 {gain} дБ
               </span>
-              <input
-                type="range"
-                className="eq-slider"
-                min={-12}
-                max={12}
-                step={1}
-                value={gain}
-                disabled={!enabled}
-                onChange={(event) => setEqBand(index, Number(event.target.value))}
-                style={{
-                  ['--progress' as string]: `${((gain + 12) / 24) * 100}%`,
-                }}
-                aria-label={`Полоса ${formatBand(frequency)}`}
-              />
+              <div className="eq-band-slider">
+                <span
+                  className="eq-band-fill"
+                  style={{ width: `${Math.max(0, Math.min(100, ((gain + 12) / 24) * 100))}%` }}
+                />
+                <input
+                  type="range"
+                  className="eq-slider"
+                  min={-12}
+                  max={12}
+                  step={1}
+                  value={gain}
+                  disabled={!enabled}
+                  onChange={(event) => setEqBand(index, Number(event.target.value))}
+                  aria-label={`Полоса ${formatBand(frequency)}`}
+                />
+              </div>
               <span className="eq-band-frequency">{formatBand(frequency)}</span>
             </div>
           );

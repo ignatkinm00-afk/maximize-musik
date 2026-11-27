@@ -3130,6 +3130,67 @@ input[type='range']:hover::-moz-range-thumb {
   width: 100%;
 }
 
+.eq-band-slider {
+  position: relative;
+  order: 2;
+  display: flex;
+  align-items: center;
+  height: 18px;
+  width: 100%;
+}
+
+.eq-band-slider::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.eq-band-fill {
+  position: absolute;
+  left: 0;
+  height: 4px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #a78bfa, #e879f9);
+  pointer-events: none;
+}
+
+.eq-band-slider .eq-slider {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 18px;
+  background: transparent;
+}
+
+.eq-band-slider .eq-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: transparent;
+}
+
+.eq-band-slider .eq-slider::-moz-range-track {
+  height: 4px;
+  background: transparent;
+}
+
+.eq-band-slider .eq-slider::-webkit-slider-thumb {
+  opacity: 1;
+  width: 10px;
+  height: 10px;
+  margin-top: -3px;
+  background: #fff;
+}
+
+.eq-band-slider .eq-slider::-moz-range-thumb {
+  opacity: 1;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+}
+
 .eq-band-value {
   order: 3;
   font-size: 11px;
