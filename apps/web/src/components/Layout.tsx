@@ -19,6 +19,7 @@ import { usePlayer } from '../store/player';
 import { useUi } from '../store/ui';
 import type { Playlist } from '../types';
 import { FullPlayer, PlayerBar } from './Player';
+import { EqualizerDialog } from './Equalizer';
 import { Avatar, Cover, PageLoader } from './ui';
 
 export function Brand({ compact = false }: { compact?: boolean }) {
@@ -254,6 +255,7 @@ export function AppLayout() {
       <MobileNav />
       <PlayerBar />
       <FullPlayer />
+      <EqualizerDialog />
       <ScrollToTop />
     </div>
   );

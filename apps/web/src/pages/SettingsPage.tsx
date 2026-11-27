@@ -8,6 +8,7 @@ import {
   Send,
   Server,
   Shield,
+  SlidersHorizontal,
   UserRound,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -27,6 +28,7 @@ export function SettingsPage() {
   const logout = useAuth((state) => state.logout);
   const logoutAll = useAuth((state) => state.logoutAll);
   const pushToast = useUi((state) => state.pushToast);
+  const setEqOpen = useUi((state) => state.setEqOpen);
   const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState(user?.displayName ?? '');
@@ -203,6 +205,21 @@ export function SettingsPage() {
         <div className="settings-actions">
           <button className="btn btn-primary" onClick={() => void install()}>
             <Download size={16} /> Установить приложение
+          </button>
+        </div>
+      </section>
+
+      <section className="settings-card">
+        <h2>
+          <SlidersHorizontal size={18} /> Звук
+        </h2>
+        <p className="muted">
+          Пятиполосный эквалайзер с пресетами и усиление громкости до 200% с лимитером.
+          Настройки сохраняются на этом устройстве.
+        </p>
+        <div className="settings-actions">
+          <button className="btn btn-ghost" onClick={() => setEqOpen(true)}>
+            <SlidersHorizontal size={16} /> Открыть эквалайзер
           </button>
         </div>
       </section>

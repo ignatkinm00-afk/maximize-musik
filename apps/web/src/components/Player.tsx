@@ -9,6 +9,7 @@ import {
   Shuffle,
   SkipBack,
   SkipForward,
+  SlidersHorizontal,
   Volume2,
   VolumeX,
   X,
@@ -16,6 +17,7 @@ import {
 import { useEffect } from 'react';
 import { formatTime } from '../lib/format';
 import { usePlayer } from '../store/player';
+import { useUi } from '../store/ui';
 import type { Track } from '../types';
 import { Cover, Equalizer } from './ui';
 import { LikeButton } from './Track';
@@ -59,6 +61,7 @@ export function PlayerBar() {
   const shuffle = usePlayer((state) => state.shuffle);
   const { togglePlay, next, prev, seek, setVolume, toggleMute, cycleRepeat, toggleShuffle, setExpanded } =
     usePlayer.getState();
+  const setEqOpen = useUi((state) => state.setEqOpen);
 
   if (!current) return null;
 
@@ -116,6 +119,14 @@ export function PlayerBar() {
       </div>
 
       <div className="pb-right">
+        <button
+          className="icon-btn"
+          onClick={() => setEqOpen(true)}
+          aria-label="Эквалайзер"
+          title="Эквалайзер и усиление"
+        >
+          <SlidersHorizontal size={18} />
+        </button>
         <button className="icon-btn" onClick={toggleMute} aria-label="Звук">
           {muted || volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
         </button>
@@ -123,11 +134,12 @@ export function PlayerBar() {
           type="range"
           className="volume"
           min={0}
-          max={1}
+          max={2}
           step={0.01}
           value={muted ? 0 : volume}
           onChange={(event) => setVolume(Number(event.target.value))}
-          style={{ ['--progress' as string]: `${(muted ? 0 : volume) * 100}%` }}
+          style={{ ['--progress' as string]: `${((muted ? 0 : volume) / 2) * 100}%` }}
+          title={`Громкость ${Math.round((muted ? 0 : volume) * 100)}%`}
           aria-label="Громкость"
         />
         <button className="icon-btn" onClick={() => setExpanded(true)} aria-label="Развернуть плеер">
@@ -202,6 +214,7 @@ export function FullPlayer() {
   const repeat = usePlayer((state) => state.repeat);
   const shuffle = usePlayer((state) => state.shuffle);
   const { setExpanded, togglePlay, next, prev, seek, cycleRepeat, toggleShuffle } = usePlayer.getState();
+  const setEqOpen = useUi((state) => state.setEqOpen);
 
   useEffect(() => {
     if (!expanded) return;
@@ -317,6 +330,14 @@ export function FullPlayer() {
                   aria-label="Повтор"
                 >
                   {repeat === 'one' ? <Repeat1 size={20} /> : <Repeat size={20} />}
+                </button>
+                <button
+                  className="icon-btn"
+                  onClick={() => setEqOpen(true)}
+                  aria-label="Эквалайзер"
+                  title="Эквалайзер и усиление"
+                >
+                  <SlidersHorizontal size={20} />
                 </button>
               </div>
             </div>

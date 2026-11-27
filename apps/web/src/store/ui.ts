@@ -16,6 +16,8 @@ interface UiState {
   setInstallPrompt: (handler: (() => Promise<void>) | null) => void;
   searchOpen: boolean;
   setSearchOpen: (open: boolean) => void;
+  eqOpen: boolean;
+  setEqOpen: (open: boolean) => void;
 }
 
 let toastId = 0;
@@ -33,4 +35,6 @@ export const useUi = create<UiState>((set, get) => ({
   setInstallPrompt: (handler) => set({ installPrompt: handler }),
   searchOpen: false,
   setSearchOpen: (open) => set({ searchOpen: open }),
+  eqOpen: false,
+  setEqOpen: (open) => set({ eqOpen: open }),
 }));

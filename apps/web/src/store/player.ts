@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { api, mediaUrl, streamUrl } from '../lib/api';
+import { audioFx, EQ_PRESETS } from '../lib/audioFx';
 import { haptic } from '../lib/telegram';
 import type { Track } from '../types';
 import { useUi } from './ui';
@@ -20,6 +21,8 @@ interface PlayerState {
   shuffle: boolean;
   expanded: boolean;
   loading: boolean;
+  eqEnabled: boolean;
+  eqBands: number[];
 
   playTrack: (track: Track, queue?: Track[]) => void;
   togglePlay: () => void;
@@ -34,10 +37,15 @@ interface PlayerState {
   addToQueue: (track: Track) => void;
   removeFromQueue: (id: string) => void;
   setLiked: (trackId: string, liked: boolean) => void;
+  setEqEnabled: (enabled: boolean) => void;
+  setEqBand: (index: number, gain: number) => void;
+  setEqPreset: (bands: number[]) => void;
+  resetEq: () => void;
 }
 
 const audio = new Audio();
 audio.preload = 'metadata';
+audioFx.attach(audio);
 
 let lastRecorded = '';
 let lastErrorTrack = '';
@@ -72,6 +80,8 @@ export const usePlayer = create<PlayerState>()(
       shuffle: false,
       expanded: false,
       loading: false,
+      eqEnabled: true,
+      eqBands: [...EQ_PRESETS.flat!],
 
       playTrack: (track, queue) => {
         const state = get();
@@ -100,7 +110,14 @@ export const usePlayer = create<PlayerState>()(
           loading: true,
         });
         haptic('tap');
-        audio.src = streamUrl(track);
+        const url = streamUrl(track);
+        if (/^https?:/i.test(url)) audio.crossOrigin = 'anonymous';
+        else audio.removeAttribute('crossorigin');
+        audioFx.ensure();
+        audioFx.setBoost(Math.max(1, get().volume));
+        audioFx.setBands(get().eqBands);
+        audioFx.setEnabled(get().eqEnabled);
+        audio.src = url;
         audio.currentTime = 0;
         audio.load();
         void audio
@@ -132,6 +149,7 @@ export const usePlayer = create<PlayerState>()(
           audio.pause();
           set({ playing: false });
         } else {
+          audioFx.ensure();
           void audio
             .play()
             .then(() => set({ playing: true }))
@@ -196,8 +214,10 @@ export const usePlayer = create<PlayerState>()(
       },
 
       setVolume: (value) => {
-        const volume = Math.min(1, Math.max(0, value));
-        audio.volume = volume;
+        const volume = Math.min(2, Math.max(0, value));
+        audio.volume = Math.min(1, volume);
+        audioFx.ensure();
+        audioFx.setBoost(Math.max(1, volume));
         set({ volume, muted: volume === 0 });
         if (volume > 0) audio.muted = false;
       },
@@ -241,6 +261,31 @@ export const usePlayer = create<PlayerState>()(
           queue: queue.map((item) => (item.id === trackId ? { ...item, liked } : item)),
         });
       },
+
+      setEqEnabled: (enabled) => {
+        audioFx.setEnabled(enabled);
+        set({ eqEnabled: enabled });
+      },
+
+      setEqBand: (index, gain) => {
+        const next = [...get().eqBands];
+        next[index] = Math.max(-12, Math.min(12, gain));
+        audioFx.setBand(index, next[index]!);
+        set({ eqBands: next });
+      },
+
+      setEqPreset: (bands) => {
+        const next = [...bands];
+        audioFx.setBands(next);
+        set({ eqBands: next });
+      },
+
+      resetEq: () => {
+        const flat = [...EQ_PRESETS.flat!];
+        audioFx.setBands(flat);
+        audioFx.setEnabled(true);
+        set({ eqBands: flat, eqEnabled: true });
+      },
     }),
     {
       name: 'mm-player',
@@ -249,11 +294,16 @@ export const usePlayer = create<PlayerState>()(
         muted: state.muted,
         repeat: state.repeat,
         shuffle: state.shuffle,
+        eqEnabled: state.eqEnabled,
+        eqBands: state.eqBands,
       }),
       onRehydrateStorage: () => (state) => {
         if (!state) return;
-        audio.volume = state.volume;
+        audio.volume = Math.min(1, state.volume);
         audio.muted = state.muted;
+        audioFx.setEnabled(state.eqEnabled);
+        audioFx.setBands(state.eqBands);
+        audioFx.setBoost(Math.max(1, state.volume));
       },
     },
   ),
