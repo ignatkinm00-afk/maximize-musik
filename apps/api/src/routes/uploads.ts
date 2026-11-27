@@ -81,6 +81,7 @@ export async function registerUploadRoutes(app: FastifyInstance, db: Database): 
       duration: Number.isFinite(duration) && duration > 0 ? Math.round(duration) : 0,
       audio_url: audioUrl,
       cover_url: coverUrl,
+      lyrics: null,
       color: COLORS[Math.floor(Math.random() * COLORS.length)]!,
       published: isAdmin ? 1 : 0,
       plays: 0,

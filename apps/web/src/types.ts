@@ -16,6 +16,7 @@ export interface Track {
   genre: string | null;
   duration: number;
   coverUrl: string | null;
+  lyrics?: string | null;
   color: string;
   plays: number;
   published: boolean;
@@ -23,6 +24,81 @@ export interface Track {
   liked: boolean;
   owned: boolean;
   streamUrl: string;
+}
+
+export interface UserStats {
+  xp: number;
+  level: number;
+  levelXp: number;
+  nextLevelXp: number;
+  progress: number;
+  plays: number;
+  likes: number;
+  playlists: number;
+  comments: number;
+  followers: number;
+  following: number;
+  streak: number;
+  rank: number;
+  achievements: Array<{
+    code: string;
+    title: string;
+    description: string;
+    unlocked: boolean;
+  }>;
+}
+
+export interface PublicProfile {
+  user: User;
+  stats: UserStats;
+  isFollowing: boolean;
+  isMe: boolean;
+  topTracks: Track[];
+}
+
+export interface TrackComment {
+  id: string;
+  body: string;
+  createdAt: string;
+  user: { id: string; displayName: string; avatarColor: string };
+}
+
+export interface FeedItem {
+  id: string;
+  type: 'play' | 'comment';
+  createdAt: string;
+  user: { displayName: string; avatarColor: string };
+  track: { id: string; title: string; artist: string };
+  text: string | null;
+}
+
+export interface DailyMix {
+  title: string;
+  genre: string;
+  tracks: Track[];
+}
+
+export interface RoomInfo {
+  id: string;
+  name: string;
+  hostId: string;
+  hostName?: string;
+  trackId: string | null;
+  playing: boolean;
+  position: number;
+  members: number;
+  track?: Track | null;
+  updatedAt?: string;
+  memberList?: Array<{ id: string; displayName: string; avatarColor: string }>;
+}
+
+export interface YearReview {
+  year: number;
+  plays: number;
+  minutes: number;
+  likes: number;
+  topTracks: Track[];
+  genres: Array<{ genre: string; total: number }>;
 }
 
 export interface Playlist {
@@ -34,6 +110,7 @@ export interface Playlist {
   createdAt: string;
   updatedAt: string;
   mine?: boolean;
+  shared?: boolean;
 }
 
 export interface Genre {

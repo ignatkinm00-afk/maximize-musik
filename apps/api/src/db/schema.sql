@@ -34,6 +34,49 @@ CREATE TABLE IF NOT EXISTS login_attempts (
   updated_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS follows (
+  follower_id TEXT NOT NULL,
+  following_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (follower_id, following_id)
+);
+CREATE INDEX IF NOT EXISTS idx_follows_following ON follows (following_id);
+
+CREATE TABLE IF NOT EXISTS comments (
+  id TEXT PRIMARY KEY,
+  track_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  body TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_comments_track ON comments (track_id, created_at);
+
+CREATE TABLE IF NOT EXISTS playlist_collaborators (
+  playlist_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (playlist_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_collab_user ON playlist_collaborators (user_id);
+
+CREATE TABLE IF NOT EXISTS rooms (
+  id TEXT PRIMARY KEY,
+  host_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  track_id TEXT,
+  playing INTEGER NOT NULL DEFAULT 0,
+  position INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS room_members (
+  room_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  joined_at TEXT NOT NULL,
+  PRIMARY KEY (room_id, user_id)
+);
+
 CREATE TABLE IF NOT EXISTS tracks (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
@@ -43,6 +86,7 @@ CREATE TABLE IF NOT EXISTS tracks (
   duration INTEGER NOT NULL DEFAULT 0,
   audio_url TEXT NOT NULL,
   cover_url TEXT,
+  lyrics TEXT,
   color TEXT NOT NULL DEFAULT '#8b5cf6',
   published INTEGER NOT NULL DEFAULT 1,
   plays INTEGER NOT NULL DEFAULT 0,

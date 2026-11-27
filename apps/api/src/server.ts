@@ -14,6 +14,7 @@ import { registerAdminRoutes } from './routes/admin.ts';
 import { registerAuthRoutes } from './routes/auth.ts';
 import { registerLibraryRoutes } from './routes/library.ts';
 import { registerNotificationRoutes } from './routes/notifications.ts';
+import { registerSocialRoutes } from './routes/social.ts';
 import { registerTrackRoutes } from './routes/tracks.ts';
 import { registerUploadRoutes } from './routes/uploads.ts';
 
@@ -60,7 +61,7 @@ await app.register(fastifyStatic, {
 
 app.get('/api/config', async () => ({
   app: 'Maximize Musik',
-  version: '1.0.0',
+  version: '2.0.0',
   webUrl: config.webUrl,
   telegram: {
     enabled: telegram.configured,
@@ -75,7 +76,7 @@ app.get('/api/health', async () => {
   return {
     ok: true,
     app: 'Maximize Musik',
-    version: '1.0.0',
+    version: '2.0.0',
     db: db.dialect,
     tracks: Number(trackRow?.total ?? 0),
     telegram: telegram.live ? 'live' : telegram.configured ? 'configured' : 'off',
@@ -92,6 +93,7 @@ app.get('/', async () => ({
 await registerAuthRoutes(app, db);
 await registerTrackRoutes(app, db);
 await registerLibraryRoutes(app, db);
+await registerSocialRoutes(app, db);
 await registerNotificationRoutes(app, db);
 await registerAdminRoutes(app, db);
 await registerUploadRoutes(app, db);

@@ -1,14 +1,18 @@
 import {
   Bell,
+  Download,
   HardDrive,
   Home,
   Library,
   LogOut,
+  Palette,
   Plus,
+  Radio,
   Search,
   Settings,
   Shield,
   User as UserIcon,
+  Users,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -20,6 +24,7 @@ import { useUi } from '../store/ui';
 import type { Playlist } from '../types';
 import { FullPlayer, PlayerBar } from './Player';
 import { EqualizerDialog } from './Equalizer';
+import { ThemeParticles } from './ThemeFx';
 import { Avatar, Cover, PageLoader } from './ui';
 
 export function Brand({ compact = false }: { compact?: boolean }) {
@@ -81,11 +86,23 @@ function Sidebar() {
         <NavLink to="/search">
           <Search size={18} /> <span>Поиск</span>
         </NavLink>
+        <NavLink to="/themes">
+          <Palette size={18} /> <span>Темы</span>
+        </NavLink>
+        <NavLink to="/feed">
+          <Users size={18} /> <span>Лента</span>
+        </NavLink>
+        <NavLink to="/rooms">
+          <Radio size={18} /> <span>Комнаты</span>
+        </NavLink>
         <NavLink to="/library">
           <Library size={18} /> <span>Моя музыка</span>
         </NavLink>
         <NavLink to="/local">
           <HardDrive size={18} /> <span>Офлайн</span>
+        </NavLink>
+        <NavLink to="/downloads">
+          <Download size={18} /> <span>Скачано</span>
         </NavLink>
         <NavLink to="/notifications">
           <Bell size={18} /> <span>Уведомления</span>
@@ -121,12 +138,15 @@ function Sidebar() {
       <div className="side-user">
         {user ? (
           <>
-            <NavLink to="/settings" className="side-user-link">
+            <NavLink to={`/u/${user.id}`} className="side-user-link">
               <Avatar name={user.displayName} color={user.avatarColor} size={36} />
               <span>
                 <strong>{user.displayName}</strong>
                 <em>{user.role === 'admin' ? 'администратор' : 'слушатель'}</em>
               </span>
+            </NavLink>
+            <NavLink to="/settings" className="icon-btn subtle" aria-label="Настройки">
+              <Settings size={16} />
             </NavLink>
             <button
               className="icon-btn subtle"
@@ -225,10 +245,12 @@ export function AppLayout() {
   const init = useAuth((state) => state.init);
   const current = usePlayer((state) => state.current);
   const refresh = useNotifications((state) => state.refresh);
+  const refreshOffline = usePlayer((state) => state.refreshOffline);
 
   useEffect(() => {
     void init();
-  }, [init]);
+    void refreshOffline();
+  }, [init, refreshOffline]);
 
   useEffect(() => {
     document.title = current ? `${current.title} — ${current.artist}` : 'Maximize Musik';
@@ -245,6 +267,7 @@ export function AppLayout() {
 
   return (
     <div className="app-shell">
+      <ThemeParticles />
       <Sidebar />
       <div className="app-main">
         <MobileHeader />

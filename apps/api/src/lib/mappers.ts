@@ -9,6 +9,7 @@ export interface TrackRow {
   duration: number;
   audio_url: string;
   cover_url: string | null;
+  lyrics: string | null;
   color: string;
   published: number;
   plays: number;
@@ -54,6 +55,7 @@ export function mapTrack(row: TrackRow, viewer?: UserRow | null) {
     genre: row.genre,
     duration: Number(row.duration) || 0,
     coverUrl: externalCover ? `/api/tracks/${row.id}/cover` : row.cover_url,
+    lyrics: row.lyrics ?? null,
     color: row.color,
     plays: Number(row.plays) || 0,
     published: Boolean(row.published),

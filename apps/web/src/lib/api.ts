@@ -2,12 +2,19 @@ import type {
   AdminStats,
   AdminUser,
   AppNotification,
+  DailyMix,
+  FeedItem,
   Genre,
   HomeData,
   Playlist,
+  PublicProfile,
+  RoomInfo,
   SubscribersInfo,
   Track,
+  TrackComment,
   User,
+  UserStats,
+  YearReview,
 } from '../types';
 
 const ACCESS_KEY = 'mm_token';
@@ -231,6 +238,43 @@ export const api = {
   changePassword: (data: { currentPassword: string; newPassword: string }) =>
     request<{ ok: boolean }>('/api/auth/password', { body: data }),
 
+  // ─── Социальное ───────────────────────────────────────────────────────────
+  profile: (id: string) => request<PublicProfile>(`/api/users/${id}`),
+  toggleFollow: (id: string) =>
+    request<{ following: boolean }>(`/api/users/${id}/follow`, { body: {} }),
+  followers: (id: string) => request<{ users: User[] }>(`/api/users/${id}/followers`),
+  following: (id: string) => request<{ users: User[] }>(`/api/users/${id}/following`),
+  feed: () => request<{ items: FeedItem[] }>('/api/feed'),
+  comments: (trackId: string) =>
+    request<{ comments: TrackComment[] }>(`/api/tracks/${trackId}/comments`),
+  addComment: (trackId: string, body: string) =>
+    request<{ comment: TrackComment }>(`/api/tracks/${trackId}/comments`, { body: { body } }),
+  deleteComment: (id: string) =>
+    request<{ ok: boolean }>(`/api/comments/${id}`, { method: 'DELETE' }),
+  myStats: () => request<{ stats: UserStats }>('/api/me/stats'),
+  leaderboard: () =>
+    request<{
+      users: Array<{
+        position: number;
+        id: string;
+        displayName: string;
+        avatarColor: string;
+        plays: number;
+      }>;
+    }>('/api/leaderboard'),
+  recommendations: () => request<{ mixes: DailyMix[] }>('/api/recommendations'),
+  radio: (genre?: string) =>
+    request<{ tracks: Track[] }>(`/api/radio${genre ? `?genre=${encodeURIComponent(genre)}` : ''}`),
+  yearReview: () => request<YearReview>('/api/year-review'),
+  rooms: () => request<{ rooms: RoomInfo[] }>('/api/rooms'),
+  createRoom: (data: { name: string; trackId?: string | null }) =>
+    request<{ room: RoomInfo }>('/api/rooms', { body: data }),
+  room: (id: string) => request<{ room: RoomInfo }>(`/api/rooms/${id}`),
+  joinRoom: (id: string) => request<{ ok: boolean }>(`/api/rooms/${id}/join`, { body: {} }),
+  leaveRoom: (id: string) => request<{ ok: boolean }>(`/api/rooms/${id}/leave`, { body: {} }),
+  updateRoom: (id: string, data: { trackId?: string | null; playing?: boolean; position?: number }) =>
+    request<{ ok: boolean }>(`/api/rooms/${id}`, { method: 'PATCH', body: data }),
+
   // ─── Каталог ──────────────────────────────────────────────────────────────
   home: () => request<HomeData>('/api/home'),
   tracks: (params: { q?: string; genre?: string; sort?: string; limit?: number; offset?: number } = {}) =>
@@ -249,6 +293,23 @@ export const api = {
   playlists: () => request<{ playlists: Playlist[] }>('/api/library/playlists'),
   playlist: (id: string) =>
     request<{ playlist: Playlist; tracks: Track[] }>(`/api/library/playlists/${id}`),
+  playlistCollaborators: (id: string) =>
+    request<{
+      collaborators: Array<{
+        id: string;
+        displayName: string;
+        avatarColor: string;
+        email: string | null;
+      }>;
+    }>(`/api/library/playlists/${id}/collaborators`),
+  addCollaborator: (id: string, email: string) =>
+    request<{ ok: boolean }>(`/api/library/playlists/${id}/collaborators`, {
+      body: { email },
+    }),
+  removeCollaborator: (id: string, userId: string) =>
+    request<{ ok: boolean }>(`/api/library/playlists/${id}/collaborators/${userId}`, {
+      method: 'DELETE',
+    }),
   createPlaylist: (data: { title: string; description?: string }) =>
     request<{ playlist: Playlist }>('/api/library/playlists', { body: data }),
   updatePlaylist: (id: string, data: { title?: string; description?: string | null }) =>
@@ -290,6 +351,7 @@ export const api = {
     duration?: number;
     audioUrl: string;
     coverUrl?: string | null;
+    lyrics?: string | null;
     published?: boolean;
   }) => request<{ track: Track }>('/api/admin/tracks', { body: data }),
   adminUpdateTrack: (id: string, data: Partial<{ title: string; artist: string; published: boolean; genre: string | null }>) =>

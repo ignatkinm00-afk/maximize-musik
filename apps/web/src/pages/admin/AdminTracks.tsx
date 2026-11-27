@@ -14,6 +14,7 @@ const emptyForm = {
   genre: '',
   audioUrl: '',
   coverUrl: '',
+  lyrics: '',
   duration: '',
 };
 
@@ -77,6 +78,7 @@ export function AdminTracks() {
         duration: Number(form.duration) || 0,
         audioUrl: form.audioUrl.trim(),
         coverUrl: form.coverUrl.trim() || null,
+        lyrics: form.lyrics.trim() || null,
       });
       setTracks((current) => [data.track, ...current]);
       setTotal((current) => current + 1);
@@ -322,6 +324,16 @@ export function AdminTracks() {
             value={form.audioUrl}
             onChange={(event) => setForm({ ...form, audioUrl: event.target.value })}
             placeholder="https://…/track.mp3"
+          />
+        </label>
+        <label className="field">
+          <span>Текст песни (LRC или обычный текст)</span>
+          <textarea
+            className="input textarea"
+            rows={5}
+            value={form.lyrics}
+            onChange={(event) => setForm({ ...form, lyrics: event.target.value })}
+            placeholder={'[00:12.40] Первая строка\n[00:18.20] Вторая строка'}
           />
         </label>
         <p className="hint">

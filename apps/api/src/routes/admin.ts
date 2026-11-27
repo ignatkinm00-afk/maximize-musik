@@ -29,6 +29,7 @@ const trackSchema = z.object({
   duration: z.coerce.number().int().min(0).max(36000).optional(),
   audioUrl: z.string().trim().min(3, 'Нужна ссылка на аудио').max(2000),
   coverUrl: z.string().trim().max(2000).optional().nullable(),
+  lyrics: z.string().max(20000).optional().nullable(),
   color: z
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/)
@@ -223,8 +224,8 @@ export async function registerAdminRoutes(app: FastifyInstance, db: Database): P
     const body = parse(trackSchema, req.body);
     const id = randomUUID();
     await db.run(
-      `INSERT INTO tracks (id, title, artist, album, genre, duration, audio_url, cover_url, color, published, plays, uploaded_by, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
+      `INSERT INTO tracks (id, title, artist, album, genre, duration, audio_url, cover_url, lyrics, color, published, plays, uploaded_by, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
       [
         id,
         body.title,
@@ -234,6 +235,7 @@ export async function registerAdminRoutes(app: FastifyInstance, db: Database): P
         body.duration ?? 0,
         body.audioUrl,
         body.coverUrl ?? null,
+        body.lyrics ?? null,
         body.color ?? pickColor(),
         body.published === false ? 0 : 1,
         admin.id,
@@ -253,7 +255,7 @@ export async function registerAdminRoutes(app: FastifyInstance, db: Database): P
     const body = parse(trackSchema.partial(), req.body);
     await db.run(
       `UPDATE tracks SET title = ?, artist = ?, album = ?, genre = ?, duration = ?,
-        audio_url = ?, cover_url = ?, color = ?, published = ? WHERE id = ?`,
+        audio_url = ?, cover_url = ?, lyrics = ?, color = ?, published = ? WHERE id = ?`,
       [
         body.title ?? track.title,
         body.artist ?? track.artist,
@@ -262,6 +264,7 @@ export async function registerAdminRoutes(app: FastifyInstance, db: Database): P
         body.duration ?? track.duration,
         body.audioUrl ?? track.audio_url,
         body.coverUrl === undefined ? track.cover_url : body.coverUrl,
+        body.lyrics === undefined ? track.lyrics : body.lyrics,
         body.color ?? track.color,
         body.published === undefined ? track.published : body.published ? 1 : 0,
         id,

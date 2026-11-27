@@ -1,25 +1,36 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  Check,
   ChevronDown,
+  Download,
   ListMusic,
+  Loader2,
+  MessageCircle,
   Pause,
   Play,
   Repeat,
   Repeat1,
+  Send,
   Shuffle,
   SkipBack,
   SkipForward,
   SlidersHorizontal,
+  ScrollText,
+  Trash2,
   Volume2,
   VolumeX,
   X,
 } from 'lucide-react';
-import { useEffect } from 'react';
-import { formatTime } from '../lib/format';
+import { useEffect, useState } from 'react';
+import { formatTime, relativeTime } from '../lib/format';
+import { api } from '../lib/api';
+import { useAuth } from '../store/auth';
 import { usePlayer } from '../store/player';
 import { useUi } from '../store/ui';
-import type { Track } from '../types';
-import { Cover, Equalizer } from './ui';
+import { Visualizer } from './Visualizer';
+import { LyricsView } from './Lyrics';
+import type { Track, TrackComment } from '../types';
+import { Avatar, Cover, Equalizer, Modal } from './ui';
 import { LikeButton } from './Track';
 
 export function SeekBar({
@@ -215,6 +226,36 @@ export function FullPlayer() {
   const shuffle = usePlayer((state) => state.shuffle);
   const { setExpanded, togglePlay, next, prev, seek, cycleRepeat, toggleShuffle } = usePlayer.getState();
   const setEqOpen = useUi((state) => state.setEqOpen);
+  const [lyricsOpen, setLyricsOpen] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [comments, setComments] = useState<TrackComment[]>([]);
+  const [commentText, setCommentText] = useState('');
+  const [commentBusy, setCommentBusy] = useState(false);
+  const user = useAuth((state) => state.user);
+  const offlineIds = usePlayer((state) => state.offlineIds);
+  const saveTrack = usePlayer((state) => state.downloadTrack);
+  const removeDownload = usePlayer((state) => state.removeDownload);
+  const [downloading, setDownloading] = useState(false);
+  const pushToast = useUi((state) => state.pushToast);
+  const saved = current ? offlineIds.includes(current.id) : false;
+
+  const toggleDownload = async () => {
+    if (!current || downloading) return;
+    if (saved) {
+      await removeDownload(current.id);
+      pushToast('Трек удалён из офлайна');
+      return;
+    }
+    setDownloading(true);
+    try {
+      await saveTrack(current);
+      pushToast('Трек сохранён для офлайна', 'success');
+    } catch (error) {
+      pushToast((error as Error).message, 'error');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   useEffect(() => {
     if (!expanded) return;
@@ -225,7 +266,39 @@ export function FullPlayer() {
     return () => document.removeEventListener('keydown', onKey);
   }, [expanded, setExpanded]);
 
+  useEffect(() => {
+    if (!commentsOpen || !current) return;
+    api
+      .comments(current.id)
+      .then((data) => setComments(data.comments))
+      .catch(() => undefined);
+  }, [commentsOpen, current]);
+
+  const sendComment = async () => {
+    if (!current || !commentText.trim() || commentBusy) return;
+    setCommentBusy(true);
+    try {
+      const data = await api.addComment(current.id, commentText.trim());
+      setComments((items) => [data.comment, ...items]);
+      setCommentText('');
+    } catch (error) {
+      pushToast((error as Error).message, 'error');
+    } finally {
+      setCommentBusy(false);
+    }
+  };
+
+  const removeComment = async (id: string) => {
+    try {
+      await api.deleteComment(id);
+      setComments((items) => items.filter((item) => item.id !== id));
+    } catch (error) {
+      pushToast((error as Error).message, 'error');
+    }
+  };
+
   return (
+    <>
     <AnimatePresence>
       {expanded && current ? (
         <motion.div
@@ -273,15 +346,7 @@ export function FullPlayer() {
                 />
                 <div className="fp-vinyl" aria-hidden="true" />
               </div>
-              <div className="fp-visualizer" aria-hidden="true">
-                {Array.from({ length: 26 }).map((_, index) => (
-                  <i
-                    key={index}
-                    className={playing ? 'dancing' : ''}
-                    style={{ animationDelay: `${(index % 9) * 0.11}s`, height: `${16 + ((index * 7) % 34)}px` }}
-                  />
-                ))}
-              </div>
+              <Visualizer />
             </div>
 
             <div className="fp-info">
@@ -290,7 +355,40 @@ export function FullPlayer() {
                   <h1>{current.title}</h1>
                   <p>{current.artist}</p>
                 </div>
-                <LikeButton track={current} size={24} />
+                <div className="fp-actions">
+                  <button
+                    className="icon-btn"
+                    onClick={() => void toggleDownload()}
+                    title={saved ? 'Удалить из офлайна' : 'Скачать для офлайна'}
+                    aria-label={saved ? 'Удалить из офлайна' : 'Скачать для офлайна'}
+                    disabled={downloading}
+                  >
+                    {downloading ? (
+                      <Loader2 size={21} className="spin" />
+                    ) : saved ? (
+                      <Check size={21} />
+                    ) : (
+                      <Download size={21} />
+                    )}
+                  </button>
+                  <button
+                    className="icon-btn"
+                    onClick={() => setCommentsOpen(true)}
+                    title="Комментарии"
+                    aria-label="Комментарии"
+                  >
+                    <MessageCircle size={21} />
+                  </button>
+                  <button
+                    className="icon-btn"
+                    onClick={() => setLyricsOpen(true)}
+                    title="Текст песни"
+                    aria-label="Текст песни"
+                  >
+                    <ScrollText size={22} />
+                  </button>
+                  <LikeButton track={current} size={24} />
+                </div>
               </div>
 
               <div className="fp-seek">
@@ -347,5 +445,78 @@ export function FullPlayer() {
         </motion.div>
       ) : null}
     </AnimatePresence>
+    <Modal
+      open={lyricsOpen && Boolean(current)}
+      onClose={() => setLyricsOpen(false)}
+      title={current ? `${current.title} — текст` : 'Текст'}
+      width={560}
+    >
+      <div className="lyrics-box">
+        <LyricsView text={current?.lyrics ?? ''} time={time} />
+      </div>
+    </Modal>
+    <Modal
+      open={commentsOpen && Boolean(current)}
+      onClose={() => setCommentsOpen(false)}
+      title="Комментарии"
+      width={540}
+    >
+      <div className="comments-box">
+        {user ? (
+          <div className="comment-form">
+            <textarea
+              className="input textarea"
+              rows={2}
+              value={commentText}
+              onChange={(event) => setCommentText(event.target.value)}
+              placeholder="Что думаешь об этом треке?"
+              maxLength={1000}
+            />
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => void sendComment()}
+              disabled={commentBusy || !commentText.trim()}
+            >
+              <Send size={15} /> Отправить
+            </button>
+          </div>
+        ) : (
+          <p className="hint">Войди, чтобы оставить комментарий.</p>
+        )}
+
+        <div className="comments-list">
+          {comments.length === 0 ? (
+            <p className="hint">Комментариев пока нет — будь первым.</p>
+          ) : (
+            comments.map((comment) => (
+              <article key={comment.id} className="comment">
+                <Avatar
+                  name={comment.user.displayName}
+                  color={comment.user.avatarColor}
+                  size={34}
+                />
+                <div>
+                  <div className="comment-head">
+                    <strong>{comment.user.displayName}</strong>
+                    <span>{relativeTime(comment.createdAt)}</span>
+                    {user && (user.id === comment.user.id || user.role === 'admin') ? (
+                      <button
+                        className="icon-btn subtle"
+                        onClick={() => void removeComment(comment.id)}
+                        aria-label="Удалить комментарий"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    ) : null}
+                  </div>
+                  <p>{comment.body}</p>
+                </div>
+              </article>
+            ))
+          )}
+        </div>
+      </div>
+    </Modal>
+    </>
   );
 }

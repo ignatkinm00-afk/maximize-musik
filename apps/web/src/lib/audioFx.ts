@@ -3,16 +3,18 @@
  * Подключается к HTMLAudioElement плеера один раз.
  */
 
-export const EQ_FREQUENCIES = [60, 230, 910, 3600, 14000] as const;
+export const EQ_FREQUENCIES = [
+  31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000,
+] as const;
 
 export const EQ_PRESETS: Record<string, number[]> = {
-  flat: [0, 0, 0, 0, 0],
-  bass: [9, 6, 1, -2, -3],
-  treble: [-3, -1, 1, 5, 8],
-  vocal: [-4, 0, 5, 6, 2],
-  rock: [5, 3, -1, 3, 5],
-  electronic: [7, 4, 0, 2, 6],
-  quiet: [3, 2, 3, 3, 2],
+  flat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  bass: [9, 8, 6, 4, 2, 0, 0, 0, 0, 0],
+  treble: [0, 0, 0, 0, 0, 0, 2, 4, 6, 8],
+  vocal: [-4, -3, -1, 2, 4, 5, 4, 2, 0, -2],
+  rock: [5, 4, 2, 0, -1, 0, 2, 4, 5, 4],
+  electronic: [7, 6, 3, 0, 0, 2, 3, 4, 6, 7],
+  quiet: [3, 3, 3, 2, 2, 2, 2, 2, 2, 2],
 };
 
 export const EQ_MAX_GAIN = 2.5;
@@ -23,6 +25,7 @@ class AudioFx {
   private filters: BiquadFilterNode[] = [];
   private boostNode: GainNode | null = null;
   private compressor: DynamicsCompressorNode | null = null;
+  private analyser: AnalyserNode | null = null;
   private element: HTMLAudioElement | null = null;
 
   private enabled = true;
@@ -53,6 +56,9 @@ class AudioFx {
       this.source = this.ctx.createMediaElementSource(this.element);
       this.boostNode = this.ctx.createGain();
       this.compressor = this.ctx.createDynamicsCompressor();
+      this.analyser = this.ctx.createAnalyser();
+      this.analyser.fftSize = 256;
+      this.analyser.smoothingTimeConstant = 0.82;
 
       this.compressor.threshold.value = -8;
       this.compressor.knee.value = 12;
@@ -76,7 +82,8 @@ class AudioFx {
         node = filter;
       }
       node.connect(this.compressor);
-      this.compressor.connect(this.ctx.destination);
+      this.compressor.connect(this.analyser);
+      this.analyser.connect(this.ctx.destination);
 
       this.apply();
       if (this.ctx.state === 'suspended') void this.ctx.resume();
@@ -111,6 +118,17 @@ class AudioFx {
   setBoost(value: number): void {
     this.boost = Math.max(1, Math.min(EQ_MAX_GAIN, Number(value) || 1));
     this.apply();
+  }
+
+  setNormalization(enabled: boolean): void {
+    if (!this.compressor) return;
+    this.compressor.threshold.value = enabled ? -22 : -8;
+    this.compressor.ratio.value = enabled ? 3 : 6;
+    this.compressor.knee.value = enabled ? 18 : 12;
+  }
+
+  getAnalyser(): AnalyserNode | null {
+    return this.analyser;
   }
 
   private apply(): void {

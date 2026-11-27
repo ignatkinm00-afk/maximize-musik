@@ -1,4 +1,4 @@
-import { RotateCcw, SlidersHorizontal, Volume2 } from 'lucide-react';
+import { Gauge, Moon, RotateCcw, SlidersHorizontal, Volume2 } from 'lucide-react';
 import { EQ_FREQUENCIES, EQ_PRESETS } from '../lib/audioFx';
 import { usePlayer } from '../store/player';
 import { useUi } from '../store/ui';
@@ -29,6 +29,14 @@ export function EqualizerDialog() {
   const setEqPreset = usePlayer((state) => state.setEqPreset);
   const resetEq = usePlayer((state) => state.resetEq);
   const setVolume = usePlayer((state) => state.setVolume);
+  const speed = usePlayer((state) => state.speed);
+  const setSpeed = usePlayer((state) => state.setSpeed);
+  const normalize = usePlayer((state) => state.normalize);
+  const setNormalize = usePlayer((state) => state.setNormalize);
+  const sleepUntil = usePlayer((state) => state.sleepUntil);
+  const setSleepTimer = usePlayer((state) => state.setSleepTimer);
+  const crossfade = usePlayer((state) => state.crossfade);
+  const setCrossfade = usePlayer((state) => state.setCrossfade);
 
   const activePreset = PRESET_LABELS.find(([id]) => {
     const preset = EQ_PRESETS[id]!;
@@ -40,7 +48,7 @@ export function EqualizerDialog() {
       <div className="eq-top">
         <div>
           <strong>Эквалайзер</strong>
-          <p className="hint">5 полос. Настройки сохраняются на этом устройстве.</p>
+          <p className="hint">10 полос. Настройки сохраняются на этом устройстве.</p>
         </div>
         <button
           className={`switch ${enabled ? 'on' : ''}`}
@@ -121,6 +129,80 @@ export function EqualizerDialog() {
           До 100% — обычная громкость. Выше — цифровое усиление через лимитер: громче, но
           возможны искажения на очень громких треках.
         </p>
+      </div>
+
+      <div className="eq-extra">
+        <div className="eq-extra-block">
+          <div className="eq-boost-head">
+            <span>
+              <Gauge size={16} /> Скорость
+            </span>
+            <strong>{speed.toFixed(2)}×</strong>
+          </div>
+          <input
+            type="range"
+            className="seek"
+            min={0.5}
+            max={2}
+            step={0.05}
+            value={speed}
+            onChange={(event) => setSpeed(Number(event.target.value))}
+            style={{ ['--progress' as string]: `${((speed - 0.5) / 1.5) * 100}%` }}
+            aria-label="Скорость воспроизведения"
+          />
+        </div>
+
+        <div className="eq-extra-block">
+          <div className="eq-boost-head">
+            <span>
+              <Moon size={16} /> Таймер сна
+            </span>
+            <strong>
+              {sleepUntil ? `${Math.max(0, Math.ceil((sleepUntil - Date.now()) / 60000))} мин` : 'выкл'}
+            </strong>
+          </div>
+          <div className="eq-chips">
+            {[15, 30, 45, 60].map((minutes) => (
+              <button key={minutes} className="chip chip-sm" onClick={() => setSleepTimer(minutes)}>
+                {minutes} мин
+              </button>
+            ))}
+            <button className="chip chip-sm" onClick={() => setSleepTimer(null)}>
+              Выкл
+            </button>
+          </div>
+        </div>
+
+        <div className="eq-extra-block">
+          <div className="eq-boost-head">
+            <span>Плавные переходы</span>
+            <strong>{crossfade ? `${crossfade} с` : 'выкл'}</strong>
+          </div>
+          <div className="eq-chips">
+            {[0, 2, 4, 6].map((seconds) => (
+              <button
+                key={seconds}
+                className={`chip chip-sm ${crossfade === seconds ? 'active' : ''}`}
+                onClick={() => setCrossfade(seconds)}
+              >
+                {seconds === 0 ? 'Выкл' : `${seconds} с`}
+              </button>
+            ))}
+          </div>
+          <p className="hint">Плавное затухание в конце трека и появление следующего.</p>
+        </div>
+
+        <div className="eq-boost-head">
+          <span>Нормализация громкости</span>
+          <button
+            className={`switch ${normalize ? 'on' : ''}`}
+            onClick={() => setNormalize(!normalize)}
+            aria-pressed={normalize}
+            aria-label="Нормализация громкости"
+          >
+            <span />
+          </button>
+        </div>
       </div>
 
       <div className="modal-actions">

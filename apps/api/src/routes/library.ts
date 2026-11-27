@@ -33,12 +33,18 @@ const mapPlaylist = (row: PlaylistRow, viewerId?: string) => ({
   createdAt: row.created_at,
   updatedAt: row.updated_at,
   mine: Boolean(viewerId && row.user_id === viewerId),
+  shared: Boolean(viewerId && row.user_id !== viewerId),
 });
 
 async function requirePlaylist(db: Database, user: UserRow, playlistId: string) {
   const playlist = await db.get<PlaylistRow>('SELECT * FROM playlists WHERE id = ?', [playlistId]);
   if (!playlist) throw notFound('Плейлист не найден');
-  if (playlist.user_id !== user.id) throw forbidden('Это чужой плейлист');
+  if (playlist.user_id === user.id) return playlist;
+  const collaborator = await db.get(
+    'SELECT 1 FROM playlist_collaborators WHERE playlist_id = ? AND user_id = ?',
+    [playlistId, user.id],
+  );
+  if (!collaborator) throw forbidden('Это чужой плейлист');
   return playlist;
 }
 
@@ -111,8 +117,11 @@ export async function registerLibraryRoutes(app: FastifyInstance, db: Database):
               (SELECT COUNT(*) FROM playlist_tracks pt WHERE pt.playlist_id = p.id) AS total,
               (SELECT t.cover_url FROM playlist_tracks pt JOIN tracks t ON t.id = pt.track_id
                WHERE pt.playlist_id = p.id ORDER BY pt.sort_order LIMIT 1) AS cover
-       FROM playlists p WHERE p.user_id = ? ORDER BY p.updated_at DESC`,
-      [user.id],
+       FROM playlists p
+       LEFT JOIN playlist_collaborators c ON c.playlist_id = p.id AND c.user_id = ?
+       WHERE p.user_id = ? OR c.user_id IS NOT NULL
+       ORDER BY p.updated_at DESC`,
+      [user.id, user.id],
     );
     return { playlists: rows.map((row) => mapPlaylist(row, user.id)) };
   });
@@ -166,10 +175,70 @@ export async function registerLibraryRoutes(app: FastifyInstance, db: Database):
     };
   });
 
+  app.get('/api/library/playlists/:id/collaborators', async (req) => {
+    const user = await requireUser(req, db);
+    const { id } = req.params as { id: string };
+    await requirePlaylist(db, user, id);
+    const rows = await db.all<{
+      id: string;
+      display_name: string;
+      avatar_color: string;
+      email: string | null;
+    }>(
+      `SELECT u.id, u.display_name, u.avatar_color, u.email
+       FROM playlist_collaborators c JOIN users u ON u.id = c.user_id
+       WHERE c.playlist_id = ?`,
+      [id],
+    );
+    return {
+      collaborators: rows.map((row) => ({
+        id: row.id,
+        displayName: row.display_name,
+        avatarColor: row.avatar_color,
+        email: row.email,
+      })),
+    };
+  });
+
+  app.post('/api/library/playlists/:id/collaborators', async (req, reply) => {
+    const user = await requireUser(req, db);
+    const { id } = req.params as { id: string };
+    const playlist = await requirePlaylist(db, user, id);
+    if (playlist.user_id !== user.id) throw forbidden('Приглашать может только владелец');
+    const body = parse(z.object({ email: z.string().trim().toLowerCase().email() }), req.body);
+    const target = await db.get<{ id: string }>('SELECT id FROM users WHERE email = ?', [
+      body.email,
+    ]);
+    if (!target) throw notFound('Пользователь с таким email не найден');
+    if (target.id === user.id) throw badRequest('Это твой плейлист');
+    await db.run(
+      `INSERT INTO playlist_collaborators (playlist_id, user_id, created_at)
+       VALUES (?, ?, ?) ON CONFLICT (playlist_id, user_id) DO NOTHING`,
+      [id, target.id, new Date().toISOString()],
+    );
+    reply.code(201);
+    return { ok: true };
+  });
+
+  app.delete('/api/library/playlists/:id/collaborators/:userId', async (req) => {
+    const user = await requireUser(req, db);
+    const { id, userId } = req.params as { id: string; userId: string };
+    const playlist = await requirePlaylist(db, user, id);
+    if (playlist.user_id !== user.id && userId !== user.id) {
+      throw forbidden('Удалять участников может владелец');
+    }
+    await db.run('DELETE FROM playlist_collaborators WHERE playlist_id = ? AND user_id = ?', [
+      id,
+      userId,
+    ]);
+    return { ok: true };
+  });
+
   app.patch('/api/library/playlists/:id', async (req) => {
     const user = await requireUser(req, db);
     const { id } = req.params as { id: string };
     const playlist = await requirePlaylist(db, user, id);
+    if (playlist.user_id !== user.id) throw forbidden('Редактировать может только владелец');
     const body = parse(playlistSchema.partial(), req.body);
     const title = body.title ?? playlist.title;
     const description =
@@ -185,6 +254,12 @@ export async function registerLibraryRoutes(app: FastifyInstance, db: Database):
     const user = await requireUser(req, db);
     const { id } = req.params as { id: string };
     await requirePlaylist(db, user, id);
+    if (
+      (await db.get<{ user_id: string }>('SELECT user_id FROM playlists WHERE id = ?', [id]))
+        ?.user_id !== user.id
+    ) {
+      throw forbidden('Удалить плейлист может только владелец');
+    }
     await db.run('DELETE FROM playlist_tracks WHERE playlist_id = ?', [id]);
     await db.run('DELETE FROM playlists WHERE id = ?', [id]);
     return { ok: true };

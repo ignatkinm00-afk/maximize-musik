@@ -16,7 +16,7 @@ import { githubTrack, loadGithubMusic } from '../lib/githubMusic';
 import { useAuth } from '../store/auth';
 import { usePlayer } from '../store/player';
 import { useUi } from '../store/ui';
-import type { HomeData } from '../types';
+import type { DailyMix, HomeData } from '../types';
 import { PlaylistCard, TrackCard, TrackRow } from '../components/Track';
 import { Cover, EmptyState, SectionHeader, Spinner } from '../components/ui';
 
@@ -31,6 +31,8 @@ const item = {
 
 export function HomePage() {
   const [data, setData] = useState<HomeData | null>(null);
+  const [mixes, setMixes] = useState<DailyMix[]>([]);
+  const [mixIndex, setMixIndex] = useState(0);
   const [error, setError] = useState('');
   const user = useAuth((state) => state.user);
   const playTrack = usePlayer((state) => state.playTrack);
@@ -74,6 +76,13 @@ export function HomePage() {
       alive = false;
     };
   }, [user, pushToast]);
+
+  useEffect(() => {
+    api
+      .recommendations()
+      .then((payload) => setMixes(payload.mixes))
+      .catch(() => undefined);
+  }, [user]);
 
   if (!data) {
     return (
@@ -127,6 +136,22 @@ export function HomePage() {
             <Link to="/search" className="btn btn-ghost btn-lg">
               Каталог <ArrowRight size={17} />
             </Link>
+            <button
+              className="btn btn-ghost btn-lg"
+              onClick={async () => {
+                try {
+                  const radio = await api.radio(data.genres[0]?.name);
+                  if (radio.tracks[0]) {
+                    playTrack(radio.tracks[0], radio.tracks);
+                    pushToast('Радио запущено — подборка обновляется', 'success');
+                  }
+                } catch {
+                  pushToast('Радио временно недоступно', 'error');
+                }
+              }}
+            >
+              Радио
+            </button>
           </div>
           <div className="hero-stats">
             <div>
@@ -184,6 +209,48 @@ export function HomePage() {
             </Link>
           ))}
         </motion.div>
+      ) : null}
+
+      {mixes.length > 0 ? (
+        <motion.section variants={item}>
+          <SectionHeader
+            title="Для тебя"
+            subtitle="Daily Mix по твоим жанрам"
+            action={
+              <button
+                className="link-more"
+                onClick={() => {
+                  const picked = mixes[Math.floor(Math.random() * mixes.length)];
+                  if (picked) playTrack(picked.tracks[0]!, picked.tracks);
+                }}
+              >
+                Случайный микс <ArrowRight size={15} />
+              </button>
+            }
+          />
+          {mixes.length > 1 ? (
+            <div className="genre-strip">
+              {mixes.map((mix, index) => (
+                <button
+                  key={mix.genre}
+                  className={`chip ${index === mixIndex ? 'active' : ''}`}
+                  onClick={() => setMixIndex(index)}
+                >
+                  {mix.genre}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <div className="grid-cards">
+            {(mixes[mixIndex] ?? mixes[0])?.tracks.slice(0, 8).map((track) => (
+              <TrackCard
+                key={track.id}
+                track={track}
+                queue={(mixes[mixIndex] ?? mixes[0])?.tracks ?? []}
+              />
+            ))}
+          </div>
+        </motion.section>
       ) : null}
 
       {data.newest.length > 0 ? (

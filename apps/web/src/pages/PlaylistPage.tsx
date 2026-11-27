@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Clock3, ListMusic, Pencil, Play, Plus, Shuffle, Trash2 } from 'lucide-react';
+import { Clock3, ListMusic, Pencil, Play, Plus, Shuffle, Trash2, UserPlus, Users } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
@@ -29,6 +29,12 @@ export function PlaylistPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [saving, setSaving] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviting, setInviting] = useState(false);
+  const [collaborators, setCollaborators] = useState<
+    Array<{ id: string; displayName: string; email: string | null }>
+  >([]);
 
   useEffect(() => {
     if (!id) return;
@@ -42,6 +48,12 @@ export function PlaylistPage() {
         setTracks(data.tracks);
         setTitle(data.playlist.title);
         setDescription(data.playlist.description ?? '');
+        if (data.playlist.mine) {
+          api
+            .playlistCollaborators(data.playlist.id)
+            .then((result) => setCollaborators(result.collaborators))
+            .catch(() => undefined);
+        }
       })
       .catch((err: Error) => {
         if (alive) setError(err.message);
@@ -130,6 +142,32 @@ export function PlaylistPage() {
 
   const owner = playlist.mine === true;
 
+  const invite = async () => {
+    if (!id || !inviteEmail.trim()) return;
+    setInviting(true);
+    try {
+      await api.addCollaborator(id, inviteEmail.trim());
+      const result = await api.playlistCollaborators(id);
+      setCollaborators(result.collaborators);
+      setInviteEmail('');
+      pushToast('Участник добавлен', 'success');
+    } catch (error) {
+      pushToast((error as Error).message, 'error');
+    } finally {
+      setInviting(false);
+    }
+  };
+
+  const removeCollaborator = async (userId: string) => {
+    if (!id) return;
+    try {
+      await api.removeCollaborator(id, userId);
+      setCollaborators((items) => items.filter((item) => item.id !== userId));
+    } catch (error) {
+      pushToast((error as Error).message, 'error');
+    }
+  };
+
   return (
     <motion.div className="page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <div className="playlist-hero">
@@ -147,6 +185,7 @@ export function PlaylistPage() {
           {playlist.description ? <p>{playlist.description}</p> : null}
           <div className="playlist-sub">
             <span>{tracks.length} {plural(tracks.length, 'трек', 'трека', 'треков')}</span>
+            {playlist.shared ? <span className="shared-badge">общий</span> : null}
             {totalDuration > 0 ? (
               <span>
                 <Clock3 size={13} /> {formatTime(totalDuration)}
@@ -162,6 +201,14 @@ export function PlaylistPage() {
             </button>
             {owner ? (
               <>
+                <button
+                  className="icon-btn"
+                  onClick={() => setInviteOpen(true)}
+                  aria-label="Пригласить участника"
+                  title="Общий плейлист"
+                >
+                  <Users size={17} />
+                </button>
                 <button className="icon-btn" onClick={() => setEditOpen(true)} aria-label="Изменить плейлист">
                   <Pencil size={17} />
                 </button>
@@ -222,6 +269,42 @@ export function PlaylistPage() {
           <button className="btn btn-primary" onClick={() => void save()} disabled={saving || !title.trim()}>
             {saving ? <Spinner size={16} /> : null} Сохранить
           </button>
+        </div>
+      </Modal>
+
+      <Modal open={inviteOpen} onClose={() => setInviteOpen(false)} title="Общий плейлист">
+        <p className="hint">
+          Участники могут добавлять и удалять треки. Приглашение — по email аккаунта.
+        </p>
+        <div className="comment-form">
+          <input
+            className="input"
+            type="email"
+            value={inviteEmail}
+            onChange={(event) => setInviteEmail(event.target.value)}
+            placeholder="friend@example.com"
+          />
+          <button className="btn btn-primary btn-sm" onClick={() => void invite()} disabled={inviting}>
+            <UserPlus size={15} /> {inviting ? 'Добавляю…' : 'Добавить'}
+          </button>
+        </div>
+        <div className="collaborators-list">
+          {collaborators.map((collaborator) => (
+            <div key={collaborator.id} className="collaborator-row">
+              <span>
+                <strong>{collaborator.displayName}</strong>
+                <em>{collaborator.email}</em>
+              </span>
+              <button
+                className="icon-btn subtle"
+                onClick={() => void removeCollaborator(collaborator.id)}
+                aria-label="Убрать участника"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ))}
+          {collaborators.length === 0 ? <p className="hint">Пока никого не пригласил.</p> : null}
         </div>
       </Modal>
 

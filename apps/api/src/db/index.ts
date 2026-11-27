@@ -126,6 +126,12 @@ export async function migrate(db: Database): Promise<void> {
   } catch {
     // колонка уже есть
   }
+
+  try {
+    await db.exec('ALTER TABLE tracks ADD COLUMN lyrics TEXT');
+  } catch {
+    // колонка уже есть
+  }
 }
 
 export const nowIso = () => new Date().toISOString();

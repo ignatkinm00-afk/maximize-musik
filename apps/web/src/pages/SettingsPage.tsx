@@ -1,14 +1,19 @@
 import { motion } from 'framer-motion';
 import {
+  CalendarHeart,
   Check,
   Download,
   HardDrive,
   KeyRound,
   LogOut,
+  Palette,
+  Radio,
   Send,
   Server,
   Shield,
   SlidersHorizontal,
+  Trophy,
+  Users,
   UserRound,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -211,10 +216,57 @@ export function SettingsPage() {
 
       <section className="settings-card">
         <h2>
+          <Trophy size={18} /> Профиль и прогресс
+        </h2>
+        <p className="muted">Уровень, ачивки, итоги года и рейтинг слушателей.</p>
+        <div className="settings-actions">
+          <button className="btn btn-ghost" onClick={() => navigate(`/u/${user.id}`)}>
+            <UserRound size={16} /> Мой профиль
+          </button>
+          <button className="btn btn-ghost" onClick={() => navigate('/year')}>
+            <CalendarHeart size={16} /> Итоги года
+          </button>
+          <button className="btn btn-ghost" onClick={() => navigate('/leaderboard')}>
+            <Trophy size={16} /> Рейтинг
+          </button>
+          <button className="btn btn-ghost" onClick={() => navigate('/rooms')}>
+            <Radio size={16} /> Комнаты
+          </button>
+        </div>
+      </section>
+
+      <section className="settings-card">
+        <h2>
+          <Users size={18} /> Лента
+        </h2>
+        <p className="muted">Подписки, прослушивания и комментарии друзей.</p>
+        <div className="settings-actions">
+          <button className="btn btn-ghost" onClick={() => navigate('/feed')}>
+            <Users size={16} /> Открыть ленту
+          </button>
+        </div>
+      </section>
+
+      <section className="settings-card">
+        <h2>
+          <Palette size={18} /> Темы
+        </h2>
+        <p className="muted">
+          Восемь тем, автосезонность, анимированные фоны, свой акцент и обои.
+        </p>
+        <div className="settings-actions">
+          <button className="btn btn-ghost" onClick={() => navigate('/themes')}>
+            <Palette size={16} /> Открыть темы
+          </button>
+        </div>
+      </section>
+
+      <section className="settings-card">
+        <h2>
           <SlidersHorizontal size={18} /> Звук
         </h2>
         <p className="muted">
-          Пятиполосный эквалайзер с пресетами и усиление громкости до 200% с лимитером.
+          10-полосный эквалайзер с пресетами и усиление громкости до 200% с лимитером.
           Настройки сохраняются на этом устройстве.
         </p>
         <div className="settings-actions">
@@ -360,7 +412,7 @@ export function SettingsPage() {
       </section>
 
       <p className="settings-footer">
-        Maximize Musik · версия {import.meta.env.VITE_APP_VERSION ?? '1.0.0'} · музыка без
+        Maximize Musik · версия {import.meta.env.VITE_APP_VERSION ?? '2.0.0'} · музыка без
         подписки
       </p>
     </motion.div>

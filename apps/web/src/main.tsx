@@ -5,6 +5,7 @@ import App from './App';
 import { initTelegram } from './lib/telegram';
 import './styles/global.css';
 import './styles/admin.css';
+import './styles/social.css';
 
 initTelegram();
 
