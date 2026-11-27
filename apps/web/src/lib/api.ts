@@ -310,6 +310,11 @@ export const api = {
       '/api/admin/catalog/import',
       { body: { source } },
     ),
+  adminImportR2: (data: { prefix?: string; genre?: string }) =>
+    request<{ added: number; skipped: number; total: number; files: string[] }>(
+      '/api/admin/import-r2',
+      { body: data },
+    ),
   adminNotifications: (limit = 30, offset = 0) =>
     request<{ notifications: AppNotification[]; total: number; bot: { configured: boolean; live: boolean } }>(
       `/api/admin/notifications?limit=${limit}&offset=${offset}`,

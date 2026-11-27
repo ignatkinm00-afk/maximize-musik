@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { config } from '../config.ts';
 import { insertCatalogTracks } from '../db/bootstrap.ts';
 import { catalogSourcesStatus, fetchCatalog } from '../db/sources.ts';
 import type { Database } from '../db/index.ts';
@@ -8,6 +9,12 @@ import { nowIso } from '../db/index.ts';
 import { requireAdmin, bumpTokenVersion, type UserRow } from '../lib/auth.ts';
 import { badRequest, HttpError, notFound } from '../lib/errors.ts';
 import { mapNotification, mapTrack, type NotificationRow, type TrackRow } from '../lib/mappers.ts';
+import {
+  isAudioKey,
+  isR2Configured,
+  listR2Objects,
+  r2PublicUrl,
+} from '../lib/storage.ts';
 import { telegram } from '../lib/telegram.ts';
 import { parse, pagination } from '../lib/validate.ts';
 
@@ -44,6 +51,27 @@ const userPatchSchema = z.object({
   role: z.enum(['user', 'admin']).optional(),
   banned: z.boolean().optional(),
 });
+
+const r2ImportSchema = z.object({
+  prefix: z.string().trim().max(300).default(''),
+  genre: z.string().trim().max(60).optional(),
+  published: z.boolean().default(true),
+});
+
+function parseR2TrackName(key: string): { title: string; artist: string; album: string | null } {
+  const segments = key.split('/');
+  const fileName = segments.pop() ?? key;
+  const base = fileName
+    .replace(/\.[^.]+$/, '')
+    .replace(/_/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const parts = base.split(/\s+[-–—]\s+/);
+  const artist = parts.length > 1 ? parts[0]!.slice(0, 140) : 'Неизвестный исполнитель';
+  const title = (parts.length > 1 ? parts.slice(1).join(' - ') : base).slice(0, 140) || 'Без названия';
+  const album = segments.length > 1 ? segments[segments.length - 1]!.slice(0, 140) : null;
+  return { title, artist, album };
+}
 
 export async function registerAdminRoutes(app: FastifyInstance, db: Database): Promise<void> {
   app.get('/api/admin/stats', async (req) => {
@@ -283,6 +311,66 @@ export async function registerAdminRoutes(app: FastifyInstance, db: Database): P
       total: Number(total?.total ?? 0),
     };
   });
+
+  app.post(
+    '/api/admin/import-r2',
+    { config: { rateLimit: { max: 6, timeWindow: '1 minute' } } },
+    async (req) => {
+      const admin = await requireAdmin(req, db);
+      if (!isR2Configured() || !config.r2.publicUrl) {
+        throw badRequest('Cloudflare R2 не настроен: нужны R2_* переменные и R2_PUBLIC_URL');
+      }
+      const body = parse(r2ImportSchema, req.body);
+
+      let objects: Array<{ key: string; size: number }>;
+      try {
+        objects = await listR2Objects(body.prefix);
+      } catch (error) {
+        throw new HttpError(502, `R2 недоступен: ${(error as Error).message}`, 'r2_unavailable');
+      }
+
+      const audio = objects.filter((object) => isAudioKey(object.key));
+      if (audio.length === 0) {
+        return { added: 0, skipped: 0, total: 0, files: [] as string[] };
+      }
+
+      const existingRows = await db.all<{ audio_url: string }>('SELECT audio_url FROM tracks');
+      const existing = new Set(existingRows.map((row) => row.audio_url));
+      const addedFiles: string[] = [];
+      let added = 0;
+      let skipped = 0;
+
+      for (const object of audio) {
+        const audioUrl = r2PublicUrl(object.key);
+        if (existing.has(audioUrl)) {
+          skipped += 1;
+          continue;
+        }
+        const { title, artist, album } = parseR2TrackName(object.key);
+        await db.run(
+          `INSERT INTO tracks (id, title, artist, album, genre, duration, audio_url, cover_url, color, published, plays, uploaded_by, created_at)
+           VALUES (?, ?, ?, ?, ?, 0, ?, NULL, ?, ?, 0, ?, ?)`,
+          [
+            randomUUID(),
+            title,
+            artist,
+            album,
+            body.genre || 'Другое',
+            audioUrl,
+            pickColor(),
+            body.published ? 1 : 0,
+            admin.id,
+            nowIso(),
+          ],
+        );
+        existing.add(audioUrl);
+        added += 1;
+        if (addedFiles.length < 10) addedFiles.push(`${artist} — ${title}`);
+      }
+
+      return { added, skipped, total: audio.length, files: addedFiles };
+    },
+  );
 
   app.get('/api/admin/notifications', async (req) => {
     await requireAdmin(req, db);

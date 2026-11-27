@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Pencil, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
+import { CloudDownload, Pencil, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { api } from '../../lib/api';
 import { formatCount, formatTime } from '../../lib/format';
@@ -30,6 +30,10 @@ export function AdminTracks() {
   const [deleting, setDeleting] = useState<Track | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
+  const [r2Open, setR2Open] = useState(false);
+  const [r2Prefix, setR2Prefix] = useState('music/');
+  const [r2Genre, setR2Genre] = useState('');
+  const [r2Importing, setR2Importing] = useState(false);
   const [sources, setSources] = useState<
     Array<{ id: 'audius' | 'jamendo' | 'fma'; label: string; configured: boolean; hint: string }>
   >([]);
@@ -137,6 +141,28 @@ export function AdminTracks() {
     }
   };
 
+  const importR2 = async () => {
+    setR2Importing(true);
+    try {
+      const result = await api.adminImportR2({
+        prefix: r2Prefix.trim(),
+        genre: r2Genre.trim() || undefined,
+      });
+      await load();
+      setR2Open(false);
+      pushToast(
+        result.added > 0
+          ? `R2: добавлено ${result.added} треков, пропущено ${result.skipped}`
+          : `R2: новых треков нет (найдено ${result.total})`,
+        result.added > 0 ? 'success' : 'info',
+      );
+    } catch (error) {
+      pushToast((error as Error).message, 'error');
+    } finally {
+      setR2Importing(false);
+    }
+  };
+
   return (
     <div className="admin-stack">
       <div className="admin-toolbar">
@@ -181,6 +207,9 @@ export function AdminTracks() {
         </select>
         <button className="btn btn-ghost" onClick={() => void importCatalog()} disabled={importing}>
           {importing ? <Spinner size={16} /> : <RefreshCw size={16} />} Импорт
+        </button>
+        <button className="btn btn-ghost" onClick={() => setR2Open(true)} title="Импорт из Cloudflare R2">
+          <CloudDownload size={16} /> R2
         </button>
         <button className="btn btn-primary" onClick={() => setCreateOpen(true)}>
           <Plus size={16} /> Добавить трек
@@ -305,6 +334,49 @@ export function AdminTracks() {
           </button>
           <button className="btn btn-primary" onClick={() => void create()} disabled={saving}>
             {saving ? <Spinner size={16} /> : <Plus size={16} />} Добавить
+          </button>
+        </div>
+      </Modal>
+
+      <Modal
+        open={r2Open}
+        onClose={() => setR2Open(false)}
+        title="Импорт из Cloudflare R2"
+        width={560}
+      >
+        <p className="hint">
+          Сервер просканирует бакет и создаст треки из аудиофайлов. Название и исполнитель
+          берутся из имени файла в формате «Исполнитель - Название.mp3». Уже добавленные
+          ссылки пропускаются.
+        </p>
+        <label className="field">
+          <span>Папка в бакете (prefix)</span>
+          <input
+            className="input"
+            value={r2Prefix}
+            onChange={(event) => setR2Prefix(event.target.value)}
+            placeholder="music/"
+          />
+        </label>
+        <p className="hint">
+          Если файлы загружены в корень бакета — оставь поле пустым. Для папки `music`
+          укажи `music/`.
+        </p>
+        <label className="field">
+          <span>Жанр для новых треков</span>
+          <input
+            className="input"
+            value={r2Genre}
+            onChange={(event) => setR2Genre(event.target.value)}
+            placeholder="Например, Electronic"
+          />
+        </label>
+        <div className="modal-actions">
+          <button className="btn btn-ghost" onClick={() => setR2Open(false)}>
+            Отмена
+          </button>
+          <button className="btn btn-primary" onClick={() => void importR2()} disabled={r2Importing}>
+            {r2Importing ? <Spinner size={16} /> : <CloudDownload size={16} />} Импортировать
           </button>
         </div>
       </Modal>

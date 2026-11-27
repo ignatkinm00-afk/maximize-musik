@@ -41,6 +41,93 @@ const r2Ready = () =>
       config.r2.publicUrl,
   );
 
+export const isR2Configured = () =>
+  Boolean(
+    config.r2.accountId &&
+      config.r2.accessKeyId &&
+      config.r2.secretAccessKey &&
+      config.r2.bucket,
+  );
+
+const decodeXml = (value: string) =>
+  value
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'");
+
+const AUDIO_EXTENSIONS = new Set([
+  'mp3',
+  'm4a',
+  'aac',
+  'ogg',
+  'opus',
+  'wav',
+  'flac',
+  'webm',
+]);
+
+export function isAudioKey(key: string): boolean {
+  const extension = key.split('.').pop()?.toLowerCase() ?? '';
+  return AUDIO_EXTENSIONS.has(extension);
+}
+
+/** Публичная ссылка на объект R2. */
+export function r2PublicUrl(key: string): string {
+  const encoded = key
+    .split('/')
+    .map((part) => encodeURIComponent(part))
+    .join('/');
+  return `${config.r2.publicUrl}/${encoded}`;
+}
+
+/** Список объектов бакета (до 2000 штук). */
+export async function listR2Objects(
+  prefix = '',
+): Promise<Array<{ key: string; size: number }>> {
+  if (!isR2Configured()) return [];
+
+  const client = new AwsClient({
+    accessKeyId: config.r2.accessKeyId,
+    secretAccessKey: config.r2.secretAccessKey,
+    service: 's3',
+    region: 'auto',
+  });
+
+  const results: Array<{ key: string; size: number }> = [];
+  let continuationToken = '';
+
+  for (let page = 0; page < 20; page += 1) {
+    const query = new URLSearchParams({ 'list-type': '2', 'max-keys': '1000' });
+    if (prefix) query.set('prefix', prefix);
+    if (continuationToken) query.set('continuation-token', continuationToken);
+
+    const endpoint = `https://${config.r2.accountId}.r2.cloudflarestorage.com/${config.r2.bucket}?${query.toString()}`;
+    const response = await client.fetch(endpoint, { method: 'GET' });
+    if (!response.ok) {
+      const detail = await response.text().catch(() => '');
+      throw new Error(`Cloudflare R2 ${response.status}: ${detail.slice(0, 200)}`);
+    }
+
+    const xml = await response.text();
+    for (const match of xml.matchAll(/<Contents>([\s\S]*?)<\/Contents>/g)) {
+      const chunk = match[1] ?? '';
+      const key = decodeXml(chunk.match(/<Key>([\s\S]*?)<\/Key>/)?.[1] ?? '');
+      const size = Number(chunk.match(/<Size>([\s\S]*?)<\/Size>/)?.[1] ?? 0);
+      if (key) results.push({ key, size });
+    }
+
+    if (!/<IsTruncated>true<\/IsTruncated>/.test(xml)) break;
+    continuationToken = decodeXml(
+      xml.match(/<NextContinuationToken>([\s\S]*?)<\/NextContinuationToken>/)?.[1] ?? '',
+    );
+    if (!continuationToken) break;
+  }
+
+  return results;
+}
+
 async function saveToR2(
   buffer: Buffer,
   objectPath: string,
