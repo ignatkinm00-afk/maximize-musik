@@ -57,7 +57,14 @@ export default function App() {
           <Route path="downloads" element={<DownloadsPage />} />
           <Route path="feed" element={<FeedPage />} />
           <Route path="leaderboard" element={<LeaderboardPage />} />
-          <Route path="year" element={<YearReviewPage />} />
+          <Route
+            path="year"
+            element={
+              <RequireAuth>
+                <YearReviewPage />
+              </RequireAuth>
+            }
+          />
           <Route path="rooms" element={<RoomsPage />} />
           <Route path="room/:id" element={<RoomPage />} />
           <Route path="u/:id" element={<ProfilePage />} />
