@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, type LucideIcon } from 'lucide-react';
 import { useEffect, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { mediaUrl } from '../lib/api';
 import { initials } from '../lib/format';
 import { useUi } from '../store/ui';
@@ -158,39 +159,41 @@ export function Modal({
     };
   }, [open, onClose]);
 
-  return (
+  if (!open) return null;
+
+  const overlay = (
     <AnimatePresence>
-      {open ? (
+      <motion.div
+        className="modal-backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+      >
         <motion.div
-          className="modal-backdrop"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
+          className="modal"
+          style={{ maxWidth: width }}
+          initial={{ y: 24, scale: 0.97 }}
+          animate={{ y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 16, scale: 0.98 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+          onClick={(event) => event.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
         >
-          <motion.div
-            className="modal"
-            style={{ maxWidth: width }}
-            initial={{ opacity: 0, y: 24, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.98 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-            onClick={(event) => event.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-          >
-            <div className="modal-head">
-              {title ? <h3>{title}</h3> : <span />}
-              <button className="icon-btn" onClick={onClose} aria-label="Закрыть">
-                <X size={18} />
-              </button>
-            </div>
-            <div className="modal-body">{children}</div>
-          </motion.div>
+          <div className="modal-head">
+            {title ? <h3>{title}</h3> : <span />}
+            <button className="icon-btn" onClick={onClose} aria-label="Закрыть">
+              <X size={18} />
+            </button>
+          </div>
+          <div className="modal-body">{children}</div>
         </motion.div>
-      ) : null}
+      </motion.div>
     </AnimatePresence>
   );
+
+  return createPortal(overlay, document.body);
 }
 
 export function ToastHost() {
