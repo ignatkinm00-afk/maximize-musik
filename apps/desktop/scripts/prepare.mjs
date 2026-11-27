@@ -13,7 +13,13 @@ console.log('▶ Собираю веб-приложение для Windows (base
 execSync('npm run build --workspace @maximize/web', {
   cwd: root,
   stdio: 'inherit',
-  env: { ...process.env, VITE_BASE: './' },
+  env: {
+    ...process.env,
+    VITE_BASE: './',
+    VITE_API_URL:
+      process.env.VITE_API_URL || 'https://maximize-musik-api-xpqi.onrender.com',
+    VITE_APP_VERSION: '2.0.0',
+  },
 });
 
 if (!fs.existsSync(dist)) {

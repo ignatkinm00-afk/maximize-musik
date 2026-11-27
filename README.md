@@ -343,8 +343,8 @@ npm run build:win
 
 Готовые файлы появятся в `apps/desktop/release`:
 
-- `Maximize-Musik-Setup-1.0.0.exe` — установщик (NSIS);
-- `Maximize-Musik-Portable-1.0.0.exe` — портативная версия.
+- `Maximize-Musik-Setup-2.0.0.exe` — установщик (NSIS);
+- `Maximize-Musik-Portable-2.0.0.exe` — портативная версия.
 
 При первом запуске нажми **«Подключить сервер API»** на экране входа и вставь адрес
 Render, например `https://maximize-musik-api.onrender.com`. Адрес запомнится в браузере
