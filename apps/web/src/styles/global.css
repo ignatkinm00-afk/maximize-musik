@@ -2968,6 +2968,80 @@ input[type='range']:hover::-moz-range-thumb {
   padding-top: 46px;
 }
 
+/* ─── GitHub / офлайн-музыка ─────────────────────────────── */
+
+.local-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.local-summary > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.local-summary strong {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.local-summary span {
+  font-size: 11.5px;
+  color: var(--muted-2);
+}
+
+.local-row {
+  display: grid;
+  grid-template-columns: 26px 44px minmax(0, 1fr) auto 46px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+
+.local-row:hover {
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.local-row.is-active {
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.16), rgba(139, 92, 246, 0.03));
+}
+
+.local-row-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-2);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.local-command {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.35);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.local-command code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  color: #c4b5fd;
+}
+
 /* ─── Animations ──────────────────────────────────────────── */
 
 @keyframes spin {

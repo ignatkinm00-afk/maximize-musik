@@ -265,7 +265,9 @@ audio.addEventListener('timeupdate', () => {
   if (!state.current) return;
   if (audio.currentTime > 15 && lastRecorded !== state.current.id) {
     lastRecorded = state.current.id;
-    void api.recordPlay(state.current.id).catch(() => undefined);
+    if (!state.current.id.startsWith('gh-')) {
+      void api.recordPlay(state.current.id).catch(() => undefined);
+    }
   }
 });
 

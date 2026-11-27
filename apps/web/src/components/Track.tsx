@@ -39,6 +39,8 @@ export function LikeButton({
     setLocalLiked(track.liked);
   }, [track.id, track.liked]);
 
+  if (track.id.startsWith('gh-')) return null;
+
   const toggle = async (event: React.MouseEvent) => {
     event.stopPropagation();
     if (!user) {
@@ -298,7 +300,7 @@ export function TrackRow({
 
       <LikeButton track={track} onChange={onLikeChange} />
       <span className="row-duration">{formatTime(track.duration)}</span>
-      <TrackMenu track={track} onRemove={onRemove} />
+      {track.id.startsWith('gh-') ? null : <TrackMenu track={track} onRemove={onRemove} />}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import {
   Check,
   Download,
+  HardDrive,
   KeyRound,
   LogOut,
   Send,
@@ -196,6 +197,21 @@ export function SettingsPage() {
           <button className="btn btn-primary" onClick={() => void install()}>
             <Download size={16} /> Установить приложение
           </button>
+        </div>
+      </section>
+
+      <section className="settings-card">
+        <h2>
+          <HardDrive size={18} /> Офлайн-музыка
+        </h2>
+        <p className="muted">
+          Треки из папки <code>music/</code> в репозитории играют прямо с GitHub Pages — без
+          API, Supabase и VPN. Добавить свои файлы: <code>npm run music:add -- "C:\Music"</code>.
+        </p>
+        <div className="settings-actions">
+          <Link className="btn btn-ghost" to="/local">
+            <HardDrive size={16} /> Открыть офлайн-музыку
+          </Link>
         </div>
       </section>
 

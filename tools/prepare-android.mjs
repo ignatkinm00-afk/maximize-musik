@@ -25,6 +25,10 @@ for (const name of fs.readdirSync(target)) {
   }
 }
 
+// Аудио из папки music/ не тащим в APK: она может весить сотни мегабайт.
+// Офлайн-раздел доступен на сайте и в Windows-версии.
+fs.rmSync(path.join(target, 'music'), { recursive: true, force: true });
+
 const indexPath = path.join(target, 'index.html');
 let html = fs.readFileSync(indexPath, 'utf8');
 html = html

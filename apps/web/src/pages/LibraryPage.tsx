@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Heart, History, Library, ListMusic, Plus, Upload, UploadCloud } from 'lucide-react';
+import { Heart, HardDrive, History, Library, ListMusic, Plus, Upload, UploadCloud } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
@@ -103,6 +103,9 @@ export function LibraryPage() {
           <p>{description}</p>
         </div>
         <div className="page-actions">
+          <Link className="btn btn-ghost" to="/local">
+            <HardDrive size={16} /> GitHub
+          </Link>
           <button className="btn btn-ghost" onClick={() => setUploadOpen(true)}>
             <Upload size={16} /> Загрузить
           </button>

@@ -148,6 +148,15 @@ async function proxyAudio(req: FastifyRequest, reply: FastifyReply, sourceUrl: s
   return reply.send(Readable.fromWeb(response.body as Parameters<typeof Readable.fromWeb>[0]));
 }
 
+const IMAGE_MIME: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  gif: 'image/gif',
+  avif: 'image/avif',
+};
+
 export async function registerTrackRoutes(app: FastifyInstance, db: Database): Promise<void> {
   app.get('/api/tracks', async (req) => {
     const query = parse(trackQuery, req.query);
@@ -246,6 +255,42 @@ export async function registerTrackRoutes(app: FastifyInstance, db: Database): P
       }
     }
     return { track: mapTrack(track, viewer) };
+  });
+
+  app.get('/api/tracks/:id/cover', async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const track = await db.get<{ cover_url: string | null }>(
+      'SELECT cover_url FROM tracks WHERE id = ?',
+      [id],
+    );
+    if (!track?.cover_url) throw notFound('Обложка не найдена');
+
+    if (isLocalMedia(track.cover_url)) {
+      const filePath = localMediaPath(track.cover_url);
+      try {
+        await fsp.access(filePath);
+      } catch {
+        throw notFound('Файл обложки не найден');
+      }
+      const extension = path.extname(filePath).slice(1).toLowerCase();
+      reply.header('Content-Type', IMAGE_MIME[extension] ?? 'application/octet-stream');
+      reply.header('Cache-Control', 'public, max-age=604800, immutable');
+      return reply.send(createReadStream(filePath));
+    }
+
+    if (!/^https?:\/\//i.test(track.cover_url)) throw notFound('Обложка недоступна');
+    const response = await fetch(track.cover_url, {
+      headers: { Accept: 'image/*', 'User-Agent': 'MaximizeMusik/1.0' },
+      redirect: 'follow',
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!response.ok || !response.body) throw notFound('Обложка недоступна');
+    const contentType = response.headers.get('content-type') ?? 'image/jpeg';
+    const length = response.headers.get('content-length');
+    reply.header('Content-Type', contentType);
+    reply.header('Cache-Control', 'public, max-age=86400');
+    if (length) reply.header('Content-Length', length);
+    return reply.send(Readable.fromWeb(response.body as never));
   });
 
   app.get('/api/tracks/:id/stream', async (req, reply) => {

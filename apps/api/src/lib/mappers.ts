@@ -45,6 +45,7 @@ export function mapUser(row: UserRow) {
 }
 
 export function mapTrack(row: TrackRow, viewer?: UserRow | null) {
+  const externalCover = row.cover_url ? /^https?:\/\//i.test(row.cover_url) : false;
   return {
     id: row.id,
     title: row.title,
@@ -52,7 +53,7 @@ export function mapTrack(row: TrackRow, viewer?: UserRow | null) {
     album: row.album,
     genre: row.genre,
     duration: Number(row.duration) || 0,
-    coverUrl: row.cover_url,
+    coverUrl: externalCover ? `/api/tracks/${row.id}/cover` : row.cover_url,
     color: row.color,
     plays: Number(row.plays) || 0,
     published: Boolean(row.published),

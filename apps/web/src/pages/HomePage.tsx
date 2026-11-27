@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { formatCount } from '../lib/format';
+import { githubTrack, loadGithubMusic } from '../lib/githubMusic';
 import { useAuth } from '../store/auth';
 import { usePlayer } from '../store/player';
 import { useUi } from '../store/ui';
@@ -42,8 +43,30 @@ export function HomePage() {
       .then((payload) => {
         if (alive) setData(payload);
       })
-      .catch((err: Error) => {
+      .catch(async (err: Error) => {
         if (!alive) return;
+        const local = (await loadGithubMusic()).map(githubTrack);
+        if (!alive) return;
+        if (local.length > 0) {
+          const counts = new Map<string, number>();
+          for (const track of local) {
+            if (!track.genre) continue;
+            counts.set(track.genre, (counts.get(track.genre) ?? 0) + 1);
+          }
+          setData({
+            featured: local[0] ?? null,
+            newest: local.slice(0, 10),
+            top: local.slice(0, 10),
+            genres: [...counts.entries()]
+              .map(([name, total]) => ({ name, total }))
+              .sort((a, b) => b.total - a.total)
+              .slice(0, 10),
+            playlists: [],
+            totalTracks: local.length,
+          });
+          pushToast('Сервер недоступен — играет музыка из GitHub', 'info');
+          return;
+        }
         setError(err.message);
         pushToast(err.message, 'error');
       });

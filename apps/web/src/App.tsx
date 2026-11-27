@@ -5,6 +5,7 @@ import { useAuth } from './store/auth';
 import { AuthPage } from './pages/AuthPage';
 import { HomePage } from './pages/HomePage';
 import { LibraryPage } from './pages/LibraryPage';
+import { LocalPage } from './pages/LocalPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { PlaylistPage } from './pages/PlaylistPage';
@@ -42,6 +43,7 @@ export default function App() {
 
         <Route element={<AppLayout />}>
           <Route index element={<HomePage />} />
+          <Route path="local" element={<LocalPage />} />
           <Route path="search" element={<SearchPage />} />
           <Route
             path="library"

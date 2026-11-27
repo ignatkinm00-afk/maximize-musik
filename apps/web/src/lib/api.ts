@@ -54,19 +54,20 @@ export function setApiBase(value: string): void {
 }
 
 function resolveUrl(path: string): string {
-  if (/^https?:\/\//.test(path)) return path;
+  if (/^(https?:|file:|data:|blob:)/i.test(path)) return path;
   return `${apiBase()}${path}`;
 }
 
 export function mediaUrl(path: string | null | undefined): string {
   if (!path) return '';
-  if (path.startsWith('data:') || /^https?:\/\//.test(path)) return path;
+  if (/^(https?:|file:|data:|blob:)/i.test(path)) return path;
   return `${apiBase()}${path}`;
 }
 
 export function streamUrl(track: Track): string {
   const base = resolveUrl(track.streamUrl);
-  if (!token) return base;
+  // Токен нужен только для аудио нашего API (черновики), не для статики GitHub/file://
+  if (!token || !track.streamUrl.startsWith('/api/')) return base;
   return `${base}${base.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
 }
 

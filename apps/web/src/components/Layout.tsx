@@ -1,5 +1,6 @@
 import {
   Bell,
+  HardDrive,
   Home,
   Library,
   LogOut,
@@ -82,6 +83,9 @@ function Sidebar() {
         <NavLink to="/library">
           <Library size={18} /> <span>Моя музыка</span>
         </NavLink>
+        <NavLink to="/local">
+          <HardDrive size={18} /> <span>Офлайн</span>
+        </NavLink>
         <NavLink to="/notifications">
           <Bell size={18} /> <span>Уведомления</span>
           {unread > 0 ? <em className="nav-badge">{unread > 9 ? '9+' : unread}</em> : null}
@@ -154,6 +158,9 @@ function MobileHeader() {
         <Brand compact />
       </NavLink>
       <div className="mobile-header-actions">
+        <NavLink to="/local" className="icon-btn" aria-label="Офлайн-музыка">
+          <HardDrive size={20} />
+        </NavLink>
         <NavLink to="/notifications" className="icon-btn" aria-label="Уведомления">
           <Bell size={20} />
           {unread > 0 ? <em className="dot" /> : null}
