@@ -84,7 +84,7 @@ export function EqualizerDialog() {
                 disabled={!enabled}
                 onChange={(event) => setEqBand(index, Number(event.target.value))}
                 style={{
-                  ['--eq-progress' as string]: `${((gain + 12) / 24) * 100}%`,
+                  ['--progress' as string]: `${((gain + 12) / 24) * 100}%`,
                 }}
                 aria-label={`Полоса ${formatBand(frequency)}`}
               />
