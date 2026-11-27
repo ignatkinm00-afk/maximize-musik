@@ -5,7 +5,7 @@ import { insertCatalogTracks } from '../db/bootstrap.ts';
 import { catalogSourcesStatus, fetchCatalog } from '../db/sources.ts';
 import type { Database } from '../db/index.ts';
 import { nowIso } from '../db/index.ts';
-import { requireAdmin, type UserRow } from '../lib/auth.ts';
+import { requireAdmin, bumpTokenVersion, type UserRow } from '../lib/auth.ts';
 import { badRequest, HttpError, notFound } from '../lib/errors.ts';
 import { mapNotification, mapTrack, type NotificationRow, type TrackRow } from '../lib/mappers.ts';
 import { telegram } from '../lib/telegram.ts';
@@ -154,6 +154,9 @@ export async function registerAdminRoutes(app: FastifyInstance, db: Database): P
       body.banned === undefined ? target.banned : body.banned ? 1 : 0,
       id,
     ]);
+    if (body.banned === true) {
+      await bumpTokenVersion(db, id);
+    }
     return { ok: true };
   });
 

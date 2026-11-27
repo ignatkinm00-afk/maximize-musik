@@ -25,6 +25,7 @@ export function SettingsPage() {
   const user = useAuth((state) => state.user);
   const setUser = useAuth((state) => state.setUser);
   const logout = useAuth((state) => state.logout);
+  const logoutAll = useAuth((state) => state.logoutAll);
   const pushToast = useUi((state) => state.pushToast);
   const navigate = useNavigate();
 
@@ -94,8 +95,12 @@ export function SettingsPage() {
   };
 
   const changePassword = async () => {
-    if (newPassword.length < 8) {
-      pushToast('Новый пароль минимум 8 символов', 'error');
+    if (newPassword.length < 10) {
+      pushToast('Новый пароль минимум 10 символов', 'error');
+      return;
+    }
+    if (!/[A-Za-zА-Яа-я]/.test(newPassword) || !/\d/.test(newPassword)) {
+      pushToast('Пароль должен содержать буквы и цифры', 'error');
       return;
     }
     setChanging(true);
@@ -103,7 +108,9 @@ export function SettingsPage() {
       await api.changePassword({ currentPassword, newPassword });
       setCurrentPassword('');
       setNewPassword('');
-      pushToast('Пароль обновлён', 'success');
+      pushToast('Пароль обновлён. Войди заново.', 'success');
+      logout();
+      navigate('/login', { replace: true });
     } catch (error) {
       pushToast((error as Error).message, 'error');
     } finally {
@@ -306,18 +313,33 @@ export function SettingsPage() {
       ) : null}
 
       <section className="settings-card danger-zone">
-        <h2>Выход</h2>
-        <p className="muted">Завершить сессию на этом устройстве.</p>
-        <button
-          className="btn btn-danger"
-          onClick={() => {
-            logout();
-            navigate('/');
-            pushToast('Ты вышел из аккаунта');
-          }}
-        >
-          <LogOut size={16} /> Выйти
-        </button>
+        <h2>Сессии и выход</h2>
+        <p className="muted">
+          «Выйти со всех устройств» завершит все сессии и отзовёт токены — полезно, если
+          телефон потерян или пароль мог утечь.
+        </p>
+        <div className="settings-actions">
+          <button
+            className="btn btn-ghost"
+            onClick={async () => {
+              await logoutAll();
+              navigate('/login', { replace: true });
+              pushToast('Все сессии завершены');
+            }}
+          >
+            <Shield size={16} /> Выйти со всех устройств
+          </button>
+          <button
+            className="btn btn-danger"
+            onClick={() => {
+              logout();
+              navigate('/');
+              pushToast('Ты вышел из аккаунта');
+            }}
+          >
+            <LogOut size={16} /> Выйти
+          </button>
+        </div>
       </section>
 
       <p className="settings-footer">Maximize Musik · версия 1.0.0 · музыка без подписки</p>

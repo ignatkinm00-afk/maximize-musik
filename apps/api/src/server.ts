@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import helmet from '@fastify/helmet';
 import multipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
 import fastifyStatic from '@fastify/static';
@@ -25,6 +26,12 @@ const app = Fastify({
   logger: { level: process.env.LOG_LEVEL ?? 'info' },
   trustProxy: true,
   bodyLimit: 2 * 1024 * 1024,
+});
+
+await app.register(helmet, {
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginEmbedderPolicy: false,
 });
 
 await app.register(cors, {

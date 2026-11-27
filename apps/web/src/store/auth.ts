@@ -1,14 +1,21 @@
 import { create } from 'zustand';
-import { api, getToken, setToken } from '../lib/api';
+import { api, clearSession, getToken, setSessionTokens } from '../lib/api';
 import type { User } from '../types';
+
+export interface AuthSession {
+  accessToken: string;
+  refreshToken: string;
+  user: User;
+}
 
 interface AuthState {
   user: User | null;
   ready: boolean;
   init: () => Promise<void>;
-  setSession: (token: string, user: User) => void;
+  setSession: (session: AuthSession) => void;
   setUser: (user: User) => void;
   logout: () => void;
+  logoutAll: () => Promise<void>;
 }
 
 export const useAuth = create<AuthState>((set) => ({
@@ -28,15 +35,26 @@ export const useAuth = create<AuthState>((set) => ({
     }
   },
 
-  setSession: (token, user) => {
-    setToken(token);
+  setSession: ({ accessToken, refreshToken, user }) => {
+    setSessionTokens(accessToken, refreshToken);
     set({ user, ready: true });
   },
 
   setUser: (user) => set({ user }),
 
   logout: () => {
-    setToken('');
+    void api.logout();
+    clearSession();
+    set({ user: null });
+  },
+
+  logoutAll: async () => {
+    try {
+      await api.logoutAll();
+    } catch {
+      // даже если сервер недоступен — локально выходим
+    }
+    clearSession();
     set({ user: null });
   },
 }));

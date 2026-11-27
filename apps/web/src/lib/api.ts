@@ -10,10 +10,13 @@ import type {
   User,
 } from '../types';
 
-const TOKEN_KEY = 'mm_token';
+const ACCESS_KEY = 'mm_token';
+const REFRESH_KEY = 'mm_refresh';
 const API_KEY = 'mm_api_base';
 
-let token = typeof localStorage !== 'undefined' ? localStorage.getItem(TOKEN_KEY) ?? '' : '';
+let token = typeof localStorage !== 'undefined' ? localStorage.getItem(ACCESS_KEY) ?? '' : '';
+let refreshToken =
+  typeof localStorage !== 'undefined' ? localStorage.getItem(REFRESH_KEY) ?? '' : '';
 
 export class ApiError extends Error {
   status: number;
@@ -31,11 +34,24 @@ export function getToken(): string {
   return token;
 }
 
-export function setToken(value: string): void {
-  token = value;
+export function getRefreshToken(): string {
+  return refreshToken;
+}
+
+export function setSessionTokens(accessToken: string, nextRefreshToken: string): void {
+  token = accessToken;
+  refreshToken = nextRefreshToken;
   if (typeof localStorage === 'undefined') return;
-  if (value) localStorage.setItem(TOKEN_KEY, value);
-  else localStorage.removeItem(TOKEN_KEY);
+  localStorage.setItem(ACCESS_KEY, accessToken);
+  localStorage.setItem(REFRESH_KEY, nextRefreshToken);
+}
+
+export function clearSession(): void {
+  token = '';
+  refreshToken = '';
+  if (typeof localStorage === 'undefined') return;
+  localStorage.removeItem(ACCESS_KEY);
+  localStorage.removeItem(REFRESH_KEY);
 }
 
 export function apiBase(): string {
@@ -66,7 +82,7 @@ export function mediaUrl(path: string | null | undefined): string {
 
 export function streamUrl(track: Track): string {
   const base = resolveUrl(track.streamUrl);
-  // Токен нужен только для аудио нашего API (черновики), не для статики GitHub/file://
+  // Токен нужен только для аудио нашего API (черновиков), не для статики GitHub/file://
   if (!token || !track.streamUrl.startsWith('/api/')) return base;
   return `${base}${base.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
 }
@@ -78,7 +94,48 @@ interface RequestOptions {
   signal?: AbortSignal;
 }
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+let refreshPromise: Promise<boolean> | null = null;
+
+async function refreshAccess(): Promise<boolean> {
+  if (!refreshToken) return false;
+  if (!refreshPromise) {
+    refreshPromise = (async () => {
+      try {
+        const response = await fetch(`${apiBase()}/api/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+        });
+        if (!response.ok) return false;
+        const data = (await response.json()) as {
+          accessToken?: string;
+          refreshToken?: string;
+        };
+        if (!data.accessToken || !data.refreshToken) return false;
+        setSessionTokens(data.accessToken, data.refreshToken);
+        return true;
+      } catch {
+        return false;
+      } finally {
+        refreshPromise = null;
+      }
+    })();
+  }
+  return refreshPromise;
+}
+
+const NO_REFRESH_PATHS = new Set([
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/telegram',
+  '/api/auth/refresh',
+]);
+
+async function request<T>(
+  path: string,
+  options: RequestOptions = {},
+  allowRefresh = true,
+): Promise<T> {
   const headers: Record<string, string> = {};
   if (token) headers.Authorization = `Bearer ${token}`;
   let body: BodyInit | undefined;
@@ -113,17 +170,30 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   }
 
   if (!response.ok) {
-    const payload = (data ?? {}) as { error?: string; code?: string };
-    if (response.status === 401 && token) {
-      setToken('');
+    if (
+      response.status === 401 &&
+      allowRefresh &&
+      refreshToken &&
+      !NO_REFRESH_PATHS.has(path)
+    ) {
+      const refreshed = await refreshAccess();
+      if (refreshed) return request<T>(path, options, false);
+    }
+
+    if (response.status === 401) {
+      clearSession();
       window.dispatchEvent(new Event('mm:unauthorized'));
     }
-    throw new ApiError(payload.error ?? `Ошибка запроса (${response.status})`, response.status, payload.code);
+    const payload = (data ?? {}) as { error?: string; code?: string };
+    throw new ApiError(
+      payload.error ?? `Ошибка запроса (${response.status})`,
+      response.status,
+      payload.code,
+    );
   }
 
   return data as T;
 }
-
 const query = (params: Record<string, string | number | undefined>) => {
   const search = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -136,11 +206,25 @@ const query = (params: Record<string, string | number | undefined>) => {
 export const api = {
   // ─── Авторизация ──────────────────────────────────────────────────────────
   register: (data: { email: string; password: string; displayName: string }) =>
-    request<{ token: string; user: User }>('/api/auth/register', { body: data }),
+    request<{ accessToken: string; refreshToken: string; user: User }>('/api/auth/register', {
+      body: data,
+    }),
   login: (data: { email: string; password: string }) =>
-    request<{ token: string; user: User }>('/api/auth/login', { body: data }),
+    request<{ accessToken: string; refreshToken: string; user: User }>('/api/auth/login', {
+      body: data,
+    }),
   telegramLogin: (initData: string) =>
-    request<{ token: string; user: User }>('/api/auth/telegram', { body: { initData } }),
+    request<{ accessToken: string; refreshToken: string; user: User }>('/api/auth/telegram', {
+      body: { initData },
+    }),
+  logout: () => {
+    const currentRefresh = getRefreshToken();
+    if (!currentRefresh) return Promise.resolve({ ok: true });
+    return request<{ ok: boolean }>('/api/auth/logout', {
+      body: { refreshToken: currentRefresh },
+    }).catch(() => ({ ok: true }));
+  },
+  logoutAll: () => request<{ ok: boolean }>('/api/auth/logout-all', { body: {} }),
   me: () => request<{ user: User }>('/api/auth/me'),
   updateMe: (data: { displayName?: string; avatarColor?: string }) =>
     request<{ user: User }>('/api/auth/me', { method: 'PATCH', body: data }),

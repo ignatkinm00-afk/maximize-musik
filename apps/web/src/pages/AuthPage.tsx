@@ -32,8 +32,8 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
     setTelegramBusy(true);
     api
       .telegramLogin(telegram.initData)
-      .then(({ token, user: profile }) => {
-        setSession(token, profile);
+      .then(({ accessToken, refreshToken, user: profile }) => {
+        setSession({ accessToken, refreshToken, user: profile });
         pushToast(`Привет, ${profile.displayName}!`, 'success');
         navigate('/', { replace: true });
       })
@@ -50,7 +50,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
         mode === 'login'
           ? await api.login({ email: email.trim(), password })
           : await api.register({ email: email.trim(), password, displayName: displayName.trim() });
-      setSession(result.token, result.user);
+      setSession(result);
       pushToast(mode === 'login' ? 'С возвращением!' : 'Аккаунт создан — добро пожаловать!', 'success');
       navigate('/', { replace: true });
     } catch (err) {
@@ -180,10 +180,10 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                placeholder={mode === 'register' ? 'Минимум 8 символов' : 'Твой пароль'}
+                placeholder={mode === 'register' ? 'Минимум 10 символов, буквы и цифры' : 'Твой пароль'}
                 autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
                 required
-                minLength={mode === 'register' ? 8 : 1}
+                minLength={mode === 'register' ? 10 : 1}
               />
             </label>
 

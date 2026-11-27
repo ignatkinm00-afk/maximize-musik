@@ -33,8 +33,8 @@ check('health', health.data.ok === true, `${health.data.tracks} треков, ${
 const login = await call('/api/auth/login', {
   body: { email: 'admin@maximize.local', password: 'admin12345' },
 });
-check('вход админа', login.status === 200 && login.data.token, login.data.user?.role);
-const admin = login.data.token;
+check('вход админа', login.status === 200 && login.data.accessToken, login.data.user?.role);
+const admin = login.data.accessToken;
 
 // home
 const home = await call('/api/home');
@@ -80,8 +80,18 @@ const email = `test${Date.now()}@example.com`;
 const reg = await call('/api/auth/register', {
   body: { email, password: 'password123', displayName: 'Тестовый Слушатель' },
 });
-check('регистрация', reg.status === 201 && reg.data.token, reg.data.user?.displayName);
-const user = reg.data.token;
+check('регистрация', reg.status === 201 && reg.data.accessToken, reg.data.user?.displayName);
+
+const weak = await call('/api/auth/register', {
+  body: { email: `weak${Date.now()}@example.com`, password: 'short', displayName: 'Weak' },
+});
+check('слабый пароль отклонён', weak.status === 400);
+
+const refreshed = await call('/api/auth/refresh', {
+  body: { refreshToken: reg.data.refreshToken },
+});
+check('refresh-токен', refreshed.status === 200 && Boolean(refreshed.data.accessToken));
+const user = refreshed.data.accessToken;
 
 const bad = await call('/api/auth/login', { body: { email, password: 'wrongpass' } });
 check('неверный пароль отклонён', bad.status === 401);
@@ -138,6 +148,16 @@ const publish = await call(`/api/admin/tracks/${uploadData.track.id}`, {
   body: { published: true },
 });
 check('публикация трека', publish.status === 200 && publish.data.track.published === true);
+
+const logout = await call('/api/auth/logout', {
+  body: { refreshToken: refreshed.data.refreshToken },
+});
+check('выход из сессии', logout.status === 200);
+
+const afterLogout = await call('/api/auth/refresh', {
+  body: { refreshToken: refreshed.data.refreshToken },
+});
+check('отозванный refresh не работает', afterLogout.status === 401);
 
 // cleanup created playlist
 await call(`/api/library/playlists/${playlistId}`, { method: 'DELETE', token: admin });

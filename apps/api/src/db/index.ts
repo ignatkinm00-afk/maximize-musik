@@ -119,6 +119,13 @@ export function createDatabase(): Database {
 export async function migrate(db: Database): Promise<void> {
   const schema = fs.readFileSync(new URL('./schema.sql', import.meta.url), 'utf8');
   await db.exec(schema);
+
+  // Миграция для баз, созданных до появления token_version.
+  try {
+    await db.exec('ALTER TABLE users ADD COLUMN token_version INTEGER NOT NULL DEFAULT 0');
+  } catch {
+    // колонка уже есть
+  }
 }
 
 export const nowIso = () => new Date().toISOString();
