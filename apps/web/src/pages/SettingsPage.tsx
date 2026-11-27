@@ -359,7 +359,10 @@ export function SettingsPage() {
         </div>
       </section>
 
-      <p className="settings-footer">Maximize Musik · версия 1.0.0 · музыка без подписки</p>
+      <p className="settings-footer">
+        Maximize Musik · версия {import.meta.env.VITE_APP_VERSION ?? '1.0.0'} · музыка без
+        подписки
+      </p>
     </motion.div>
   );
 }
