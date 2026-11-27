@@ -19,3 +19,13 @@ services:
         value: https://ignatkinm00-afk.github.io/maximize-musik/
       - key: CORS_ORIGINS
         value: '*'
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        value: maximize-music
+      - key: R2_PUBLIC_URL
+        sync: false

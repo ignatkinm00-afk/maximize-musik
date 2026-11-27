@@ -41,6 +41,13 @@ export const config = {
     key: trim(process.env.SUPABASE_SERVICE_KEY),
     bucket: trim(process.env.SUPABASE_BUCKET) || 'maximize-media',
   },
+  r2: {
+    accountId: trim(process.env.R2_ACCOUNT_ID),
+    accessKeyId: trim(process.env.R2_ACCESS_KEY_ID),
+    secretAccessKey: trim(process.env.R2_SECRET_ACCESS_KEY),
+    bucket: trim(process.env.R2_BUCKET) || 'maximize-music',
+    publicUrl: trim(process.env.R2_PUBLIC_URL).replace(/\/$/, ''),
+  },
 };
 
 export const uploadsDir = path.join(config.dataDir, 'uploads');

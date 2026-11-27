@@ -189,8 +189,27 @@ npm run music:add -- "C:\Users\Digma\Music" --push
 чтобы не раздувать установщик — офлайн-раздел доступен на сайте и в Windows-сборке.
 
 Пользовательские загрузки по умолчанию хранятся в `apps/api/data/uploads`.
-В продакшене включи Supabase Storage (`SUPABASE_URL`, `SUPABASE_SERVICE_KEY`) —
-иначе файлы на бесплатном Render пропадут при перезапуске.
+В продакшене подключается хранилище по приоритету: **Cloudflare R2 → Supabase Storage →
+локальный диск**. R2 лучше для музыки: 10 ГБ бесплатно и бесплатный исходящий трафик.
+
+### Cloudflare R2 за 5 минут
+
+1. [dash.cloudflare.com](https://dash.cloudflare.com) → **R2** → **Create bucket** →
+   имя `maximize-music` (может потребоваться привязать карту).
+2. Bucket → **Settings → Public access** → включи **r2.dev** (для теста) или подключи
+   свой домен. Скопируй публичный URL — это `R2_PUBLIC_URL`.
+3. **Manage R2 API Tokens** → **Create API token** → права **Object Read & Write**,
+   ограничь бакетом. Получишь `Access Key ID`, `Secret Access Key` и `Account ID`.
+4. Добавь в Render переменные:
+   ```
+   R2_ACCOUNT_ID=...
+   R2_ACCESS_KEY_ID=...
+   R2_SECRET_ACCESS_KEY=...
+   R2_BUCKET=maximize-music
+   R2_PUBLIC_URL=https://pub-xxxx.r2.dev
+   ```
+5. Перезапусти сервис. Новые загрузки пойдут в R2; старые локальные файлы останутся
+   на месте (на бесплатном Render они всё равно не переживают рестарт).
 
 ---
 
@@ -214,6 +233,10 @@ npm run music:add -- "C:\Users\Digma\Music" --push
 | `TELEGRAM_WEBHOOK_SECRET` | `maximize-webhook` | секрет заголовка Telegram |
 | `SUPABASE_URL` / `SUPABASE_SERVICE_KEY` | — | хранение загрузок |
 | `SUPABASE_BUCKET` | `maximize-media` | бакет Storage |
+| `R2_ACCOUNT_ID` | — | Cloudflare R2: Account ID |
+| `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | — | Cloudflare R2: ключи API-токена |
+| `R2_BUCKET` | `maximize-music` | имя бакета R2 |
+| `R2_PUBLIC_URL` | — | публичный домен бакета (`https://pub-….r2.dev`) |
 | `AUDIUS_APP_NAME` | `MaximizeMusik` | app_name для Audius API |
 | `AUDIUS_API_BASE` | `https://api.audius.co` | базовый URL Audius |
 | `JAMENDO_CLIENT_ID` | — | бесплатный ключ Jamendo, включает источник |
